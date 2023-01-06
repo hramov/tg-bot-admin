@@ -6,14 +6,6 @@ import (
 	"os"
 )
 
-const (
-	serviceRegisterMailTemplate = "service_register_mail.html"
-	resetPasswordMailTemplate   = "reset_password_mail.html"
-	userRegisterMailTemplate    = "register_mail.html"
-	addToServiceMailTemplate    = "add_to_service_mail.html"
-	adminRegisterMailTemplate   = "admin_register_mail.html"
-)
-
 func sendMail(receiver string, subject string, body string) error {
 	host := config.ServerHostName
 	port := config.ServerPort
