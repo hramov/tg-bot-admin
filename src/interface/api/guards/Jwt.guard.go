@@ -2,7 +2,6 @@ package guards
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/hramov/tg-bot-admin/src/config"
 	"github.com/hramov/tg-bot-admin/src/interface/api/utils"
 	appError "github.com/hramov/tg-bot-admin/src/interface/error"
 	"github.com/hramov/tg-bot-admin/src/modules/jwt"
@@ -29,7 +28,7 @@ func JwtGuard() gin.HandlerFunc {
 			return
 		}
 		if id != 0 {
-			c.Set(config.AdminId, id)
+			c.Set("id", id)
 			c.Next()
 			return
 		}

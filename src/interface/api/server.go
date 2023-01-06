@@ -18,32 +18,14 @@ func StartServer() *gin.Engine {
 
 	// use recovery from panic middleware
 	r.Use(gin.Recovery())
-	// serve frontend
-	//_, b, _, _ := runtime.Caller(0)
-	//basePath := filepath.Dir(b)
-	//
-	//folder := basePath + "/public"
-	//file := basePath + "/public/index.html"
-	//
-	//_ = mime.AddExtensionType(".js", "text/javascript")
-	//_ = mime.AddExtensionType(".css", "text/css")
-	//r.StaticFS("/public", gin.Dir(folder, true))
-	//
-	//r.LoadHTMLFiles(file)
-	//
-	//r.GET("/", func(c *gin.Context) {
-	//	c.Redirect(http.StatusFound, "/dashboard")
-	//})
-	//
-	//r.GET("/dashboard/*page", func(c *gin.Context) {
-	//	c.HTML(http.StatusOK, "index.html", nil)
-	//})
-
 	// init routes
 	api := r.Group("/api")
 
 	auth := api.Group("/auth")
 	routes.InitAuth(auth)
+
+	user := api.Group("/user")
+	routes.InitUser(user)
 
 	return r
 }

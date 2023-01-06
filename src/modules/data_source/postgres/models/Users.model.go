@@ -8,10 +8,10 @@ import (
 type UsersModel struct {
 	Id           int
 	Name         string
-	Phone        string
-	Address      string
-	GeoLabel     string `db:"geo_label"`
-	ChatId       string `db:"chat_id"`
+	Phone        sql.NullString
+	Address      sql.NullString
+	GeoLabel     sql.NullString `db:"geo_label"`
+	ChatId       sql.NullString `db:"chat_id"`
 	Email        string
 	Password     string
 	RegisteredAt sql.NullTime `db:"registered_at"`
@@ -22,11 +22,11 @@ func (um UsersModel) Map() user.User {
 	return user.User{
 		Id:       um.Id,
 		Name:     um.Name,
-		Phone:    um.Phone,
-		Address:  um.Address,
+		Phone:    um.Phone.String,
+		Address:  um.Address.String,
 		Email:    um.Email,
 		Password: um.Password,
-		GeoLabel: um.GeoLabel,
-		ChatId:   um.ChatId,
+		GeoLabel: um.GeoLabel.String,
+		ChatId:   um.ChatId.String,
 	}
 }

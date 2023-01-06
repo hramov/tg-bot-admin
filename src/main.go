@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/hramov/tg-bot-admin/src/domain/auth"
+	"github.com/hramov/tg-bot-admin/src/domain/user"
 	"github.com/hramov/tg-bot-admin/src/interface/api"
 	"github.com/hramov/tg-bot-admin/src/interface/registry"
 	domainContainer "github.com/hramov/tg-bot-admin/src/modules/container"
@@ -34,6 +35,7 @@ func main() {
 
 	// initialize modules
 	auth.New(registry.NewAuthRegistry(pg))
+	user.New(registry.NewUserRegistry(pg))
 
 	server := api.StartServer()
 	if err := server.Run(os.Getenv("SERVER_PORT")); err != nil {
