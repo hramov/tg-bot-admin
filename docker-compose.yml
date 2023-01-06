@@ -1,0 +1,44 @@
+version: "3"
+services:
+
+  server:
+    image: hramov/auth_server:0.0.1
+    container_name: auth_server
+    depends_on:
+      - db
+    expose:
+      - "4000"
+    ports:
+      - "4000:4000"
+    environment:
+      - PG_DSN=postgres://postgres:postgres@db:54302/oauth?sslmode=disable
+      - JWT_SECRET=secret!
+      - SERVER_PORT=:4000
+    volumes:
+      - auth-logs:/usr/src/app/data
+    networks:
+      - postgres
+
+  db:
+    image: postgres
+    container_name: auth_db
+    expose:
+      - "54302"
+    ports:
+      - "54302:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+      - ./data/sql/:/docker-entrypoint-initdb.d/
+    command: -p 54302
+    networks:
+      - postgres
+
+volumes:
+  auth-db-data:
+  auth-logs:
+
+networks:
+  postgres:
+    driver: bridge

@@ -1,0 +1,7 @@
+.idea/
+.env*
+data/
+src/client_auth/*
+src/config/*_test.config.go
+bin/
+bash/
