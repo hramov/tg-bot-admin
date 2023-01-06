@@ -3,29 +3,70 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os/exec"
+	"strings"
 )
 
-var bashPath = "C:\\Program Files\\Git\\git-bash.exe"
-
-func start(name string) error {
-	command := fmt.Sprintf("docker start %s", name)
-	cmd := exec.Command(bashPath, command)
-	return cmd.Run()
+func start(name string) (string, error) {
+	cmd := exec.Command("docker", "start", name)
+	out, err := cmd.Output()
+	return string(out), err
 }
 
-func stop(name string) error {
-	command := fmt.Sprintf("docker stop %s", name)
-	cmd := exec.Command(bashPath, command)
-	return cmd.Run()
+func startAll() (string, error) {
+	namesStr, err := getAll()
+	names := strings.Split(namesStr, "\n")
+	if err != nil {
+		return "", err
+	}
+
+	for _, n := range names {
+		cmd := exec.Command("docker", "start", n)
+		_, err := cmd.Output()
+		if err != nil {
+			return "", err
+		}
+	}
+	return "", nil
+}
+
+func stop(name string) (string, error) {
+	cmd := exec.Command("docker", "stop", name)
+	out, err := cmd.Output()
+	return string(out), err
+}
+
+func stopAll() (string, error) {
+	namesStr, err := getAll()
+	names := strings.Split(namesStr, "\n")
+	if err != nil {
+		return "", err
+	}
+
+	for _, n := range names {
+		cmd := exec.Command("docker", "stop", n)
+		_, err := cmd.Output()
+		if err != nil {
+			return "", err
+		}
+	}
+	return "", nil
+}
+
+func getStarted() (string, error) {
+	cmd := exec.Command("docker", "ps", "--format", "{{.Names}}")
+	out, err := cmd.Output()
+	return string(out), err
+}
+
+func getAll() (string, error) {
+	cmd := exec.Command("docker", "ps", "-a", "--format", "{{.Names}}")
+	out, err := cmd.Output()
+	return string(out), err
 }
 
 func create(name, token string) error {
-	command := fmt.Sprintf(`
-		docker run --name %s -e 
-	`)
-	cmd := exec.Command(bashPath, command)
+	cmd := exec.Command("docker", "")
 	return cmd.Run()
 }
 
@@ -40,19 +81,33 @@ func main() {
 	flag.Parse()
 
 	var err error
+	var out string
 	switch command {
 	case "stop":
-		err = stop(name)
+		out, err = stop(name)
+		break
+	case "stopall":
+		out, err = stopAll()
 		break
 	case "start":
-		err = start(name)
+		out, err = start(name)
+		break
+	case "startall":
+		out, err = startAll()
 		break
 	case "create":
 		err = create(name, token)
 		break
+	case "started":
+		out, err = getStarted()
+		break
+	case "all":
+		out, err = getAll()
 	}
 
 	if err != nil {
-		log.Fatal(err.Error())
+		fmt.Println("Error: ", err)
 	}
+
+	fmt.Println(out)
 }
