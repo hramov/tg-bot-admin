@@ -60,13 +60,16 @@ func TestLogin_WrongPassword(t *testing.T) {
 }
 
 func TestLogin_DatabaseError(t *testing.T) {
-	logger.NewTest()
+	err := logger.NewTest()
+	if err != nil {
+		t.Error(err.Error())
+	}
 	auth.New(NewAuthRegistryMock())
 	login := &auth.Login{
 		Email:    "admin@admin.com",
 		Password: "admin1",
 	}
-	_, _, err := login.Login(context.Background())
+	_, _, err = login.Login(context.Background())
 	if err == nil {
 		t.Error("should be an error")
 	}

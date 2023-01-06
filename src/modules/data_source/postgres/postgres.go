@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/hramov/tg-bot-admin/src/config"
-	dbInit "github.com/hramov/tg-bot-admin/src/modules/data_source/postgres/init"
 	"github.com/hramov/tg-bot-admin/src/modules/logger"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -34,11 +33,11 @@ func Connect() (*Postgres, error) {
 	db.SetConnMaxIdleTime(config.ConnMaxIdleTime)
 	db.SetConnMaxLifetime(config.ConnMaxLifetime)
 
-	err = dbInit.Start(db)
-	if err != nil {
-		logger.Instance.Error(err.Error())
-		return nil, err
-	}
+	//err = dbInit.Start(db)
+	//if err != nil {
+	//	logger.Instance.Error(err.Error())
+	//	return nil, err
+	//}
 
 	instance.db = db
 	return instance, nil

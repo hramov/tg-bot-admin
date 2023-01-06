@@ -23,6 +23,7 @@ type Refresh struct {
 
 type Registry interface {
 	GetCandidate(ctx context.Context, email string) (*Login, error)
+	GetCandidateById(ctx context.Context, id int) (*Login, error)
 }
 
 func New(r Registry) {
@@ -43,13 +44,11 @@ func (l *Login) Login(ctx context.Context) (string, string, appError.IAppError) 
 	if vErr != nil {
 		return "", "", vErr
 	}
-
 	candidate, err := registry.GetCandidate(ctx, l.Email)
 	if err != nil {
 		logger.Instance.Error(err.Error())
 		return "", "", appError.DatabaseError(err)
 	}
-
 	if candidate.Id == 0 {
 		return "", "", appError.LoginOrPasswordIncorrectError()
 	}
@@ -57,15 +56,32 @@ func (l *Login) Login(ctx context.Context) (string, string, appError.IAppError) 
 	if !valid {
 		return "", "", appError.LoginOrPasswordIncorrectError()
 	}
-
 	at, rt, err := jwt.CreateToken(candidate.Id, os.Getenv("JWT_SECRET"))
 	if err != nil {
 		return "", "", appError.LoginOrPasswordIncorrectError()
 	}
-
 	return at, rt, nil
 }
 
 func (r *Refresh) Refresh(ctx context.Context) (string, string, appError.IAppError) {
-	return "", "", nil
+	id, err := jwt.CheckRefreshToken(r.RefreshToken)
+	if err != nil {
+		return "", "", appError.RefreshTokenIsInvalidError()
+	}
+	candidate, err := registry.GetCandidateById(ctx, id)
+	if err != nil {
+		logger.Instance.Error(err.Error())
+		return "", "", appError.DatabaseError(err)
+	}
+
+	if candidate.Id == 0 {
+		return "", "", appError.NoIdFoundError()
+	}
+
+	at, rt, err := jwt.CreateToken(id, os.Getenv("JWT_SECRET"))
+	if err != nil {
+		logger.Instance.Error(err.Error())
+		return "", "", appError.CreateTokenError()
+	}
+	return at, rt, nil
 }

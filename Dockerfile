@@ -10,14 +10,14 @@ COPY go.mod ./
 COPY go.sum ./
 RUN go mod download
 
-COPY ./src/app /usr/src/app/src/app
-COPY ./src/config /usr/src/app/src/config
-COPY ./src/modules /usr/src/app/src/modules
-COPY ./src/main.go /usr/src/app/src/main.go
-
+COPY ./src/ /usr/src/app/src/
 COPY ./data/ /usr/src/app/data/
 
-RUN go build -o ./bin/server ./src/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags '-extldflags "-static"' -o /usr/bin/server ./src/main.go
 
+FROM scratch
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /usr/src/app/bin/server /usr/bin/server
 EXPOSE 4000
-CMD "./bin/server"
+ENTRYPOINT ["/usr/bin/server"]
+

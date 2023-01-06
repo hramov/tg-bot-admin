@@ -44,3 +44,30 @@ func (ar AuthRegistry) GetCandidate(ctx context.Context, email string) (*auth.Lo
 		Password: res.Password,
 	}, nil
 }
+
+func (ar AuthRegistry) GetCandidateById(ctx context.Context, id int) (*auth.Login, error) {
+	conn, err := ar.dataSource.GetConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer func(conn *sqlx.Conn) {
+		err := conn.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(conn)
+
+	sql := `select id, email, password from users where id = $1`
+	var params = []interface{}{id}
+
+	res, err := postgres.ExecOne[user.User, models.UsersModel](ctx, conn, sql, params)
+	if err != nil {
+		return nil, err
+	}
+
+	return &auth.Login{
+		Id:       res.Id,
+		Email:    res.Email,
+		Password: res.Password,
+	}, nil
+}
