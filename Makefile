@@ -1,5 +1,5 @@
 start:
-	go run ./src/main.go
+	go run ./cmd/server/main.go
 
 build_windows:
 	CGO_ENABLED=0 GOOS=windows go build -a -ldflags '-extldflags "-static"' -o ./bin/server.exe ./src/main.go
