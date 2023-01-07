@@ -8,7 +8,7 @@ package init
 import (
 	"fmt"
 	"github.com/hramov/tg-bot-admin/internal/adapters/db/tables"
-	"github.com/hramov/tg-bot-admin/pkg/client/postgres/init/types"
+	"github.com/hramov/tg-bot-admin/pkg/db/postgres/init/types"
 	"github.com/jmoiron/sqlx"
 )
 

@@ -2,7 +2,7 @@ package init
 
 import (
 	"fmt"
-	"github.com/hramov/tg-bot-admin/pkg/client/postgres/init/types"
+	"github.com/hramov/tg-bot-admin/pkg/db/postgres/init/types"
 )
 
 func CreateTableSQL(schema string, table types.Table) (string, error) {

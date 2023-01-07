@@ -18,11 +18,6 @@ type Storage interface {
 	Delete(ctx context.Context, id int) (*int, error)
 }
 
-type Service struct {
-	validator *validator.Validate
-	storage   Storage
-}
-
 type IService interface {
 	GetAll(ctx context.Context, limit, offset int) ([]*User, appError.IAppError)
 	GetById(ctx context.Context, id int) (*User, appError.IAppError)
@@ -31,6 +26,11 @@ type IService interface {
 	Delete(ctx context.Context, id int) (*int, appError.IAppError)
 	Login(ctx context.Context, dto *LoginDto) (*LoginResponseDto, appError.IAppError)
 	Refresh(ctx context.Context, dto *LoginResponseDto) (*LoginResponseDto, appError.IAppError)
+}
+
+type Service struct {
+	validator *validator.Validate
+	storage   Storage
 }
 
 func NewService(storage Storage, validator *validator.Validate) IService {

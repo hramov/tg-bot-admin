@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/hramov/tg-bot-admin/internal/adapters/db"
 	"github.com/hramov/tg-bot-admin/internal/domain/user"
-	"github.com/hramov/tg-bot-admin/pkg/client/postgres"
+	"github.com/hramov/tg-bot-admin/pkg/db/postgres"
 	"github.com/jmoiron/sqlx"
 )
 

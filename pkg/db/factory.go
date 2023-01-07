@@ -1,9 +1,9 @@
-package client
+package db
 
 import (
 	"fmt"
 	"github.com/hramov/tg-bot-admin/internal/adapters/db"
-	"github.com/hramov/tg-bot-admin/pkg/client/postgres"
+	"github.com/hramov/tg-bot-admin/pkg/db/postgres"
 )
 
 const (

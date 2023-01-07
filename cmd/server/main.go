@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/hramov/tg-bot-admin/internal/composite"
 	"github.com/hramov/tg-bot-admin/pkg/api/middleware"
-	"github.com/hramov/tg-bot-admin/pkg/client"
+	"github.com/hramov/tg-bot-admin/pkg/db"
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 	"log"
@@ -16,10 +16,10 @@ func main() {
 		log.Printf("cannot load .env file: %v. if it occured inside a container, don't worry", err)
 	}
 
-	pg, err := client.DatabaseFactory(client.Postgres)
+	pg, err := db.DatabaseFactory(db.Postgres)
 	if err != nil {
 		log.Printf("cannot start postgres: %v", err)
-		os.Exit(3)
+		os.Exit(1)
 	}
 
 	router := httprouter.New()

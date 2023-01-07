@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/hramov/tg-bot-admin/internal/config"
-	initDb "github.com/hramov/tg-bot-admin/pkg/client/postgres/init"
+	initDb "github.com/hramov/tg-bot-admin/pkg/db/postgres/init"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"os"
