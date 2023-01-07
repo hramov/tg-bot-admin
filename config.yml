@@ -1,0 +1,16 @@
+---
+
+is_debug: true
+listen:
+  type: port
+  port: 4000
+storage:
+  host: localhost
+  port: 5432
+  database: tg_bot_admin
+  username: postgres
+  password: postgres
+  ssl_mode: disable
+jwt:
+  access_ttl: 30min
+  refresh_ttl: 48h

@@ -7,7 +7,6 @@ import (
 	initDb "github.com/hramov/tg-bot-admin/pkg/db/postgres/init"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"os"
 )
 
 type Postgres struct {
@@ -16,13 +15,13 @@ type Postgres struct {
 
 var instance *Postgres
 
-func Connect() (*Postgres, error) {
+func Connect(cfg *config.Config) (*Postgres, error) {
 	if instance != nil {
 		return instance, nil
 	}
 
 	instance = &Postgres{}
-	db, err := sqlx.Open("postgres", os.Getenv("PG_DSN"))
+	db, err := sqlx.Open("postgres", fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", cfg.Storage.Username, cfg.Storage.Password, cfg.Storage.Host, cfg.Storage.Port, cfg.Storage.Database, cfg.Storage.SslMode))
 	if err != nil {
 		return nil, err
 	}
