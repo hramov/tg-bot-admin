@@ -4,6 +4,8 @@
 2) httprouter
 3) sqlx
 4) golang-jwt
+5) cleanenv
+6) logrus
 
 ### Структура проекта:
 1) Cmd - точка входа в приложение

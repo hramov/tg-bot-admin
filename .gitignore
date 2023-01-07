@@ -1,5 +1,4 @@
 .idea/
-.env*
 data/
 internal/config/*_test.config.go
 bin/
