@@ -16,7 +16,7 @@ func NewStorage(db db.Connector) user.Storage {
 	return &userStorage{db: db}
 }
 
-func (us *userStorage) GetUserById(ctx context.Context, id int) (*user.User, error) {
+func (us *userStorage) GetById(ctx context.Context, id int) (*user.User, error) {
 	conn, err := us.db.GetConn(ctx)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func (us *userStorage) GetUserById(ctx context.Context, id int) (*user.User, err
 	return res, nil
 }
 
-func (us *userStorage) GetCandidate(ctx context.Context, email string) (*user.User, error) {
+func (us *userStorage) GetByEmail(ctx context.Context, email string) (*user.User, error) {
 	conn, err := us.db.GetConn(ctx)
 	if err != nil {
 		return nil, err
@@ -62,7 +62,7 @@ func (us *userStorage) GetCandidate(ctx context.Context, email string) (*user.Us
 	return res, nil
 }
 
-func (us *userStorage) GetCandidateById(ctx context.Context, id int) (*user.User, error) {
+func (us *userStorage) Get(ctx context.Context, limit, offset int) ([]*user.User, error) {
 	conn, err := us.db.GetConn(ctx)
 	if err != nil {
 		return nil, err
@@ -74,10 +74,10 @@ func (us *userStorage) GetCandidateById(ctx context.Context, id int) (*user.User
 		}
 	}(conn)
 
-	sql := `select id, email, password from users where id = $1`
-	var params = []interface{}{id}
+	sql := `select * from users limit $1 offset $2`
+	var params = []interface{}{limit, offset}
 
-	res, err := postgres.ExecOne[user.User, UsersModel](ctx, conn, sql, params)
+	res, err := postgres.Exec[user.User, UsersModel](ctx, conn, sql, params)
 	if err != nil {
 		return nil, err
 	}

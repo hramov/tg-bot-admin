@@ -9,7 +9,7 @@ type Mapper[T any] interface {
 	Map() T
 }
 
-func Exec[T any, V Mapper[T]](ctx context.Context, conn *sqlx.Conn, sql string, params []interface{}) (*[]T, error) {
+func Exec[T any, V Mapper[T]](ctx context.Context, conn *sqlx.Conn, sql string, params []interface{}) ([]*T, error) {
 	var model []V
 
 	err := conn.SelectContext(ctx, &model, sql, params...)
@@ -17,13 +17,13 @@ func Exec[T any, V Mapper[T]](ctx context.Context, conn *sqlx.Conn, sql string, 
 		return nil, err
 	}
 
-	var dto []T
+	var dto []*T
 	for _, v := range model {
 		d := v.Map()
-		dto = append(dto, d)
+		dto = append(dto, &d)
 	}
 
-	return &dto, nil
+	return dto, nil
 }
 
 func ExecOne[T any, V Mapper[T]](ctx context.Context, conn *sqlx.Conn, sql string, params []interface{}) (*T, error) {

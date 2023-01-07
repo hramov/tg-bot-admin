@@ -6,50 +6,50 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
 )
 
-func GetBody[T any](c *gin.Context) (T, error) {
+func GetBody[T any](r *http.Request) (T, error) {
 	var data T
 
-	reqBody, exists := c.Get("body")
-
-	if !exists {
-		rawData, err := io.ReadAll(c.Request.Body)
-		defer func(Body io.ReadCloser) {
-			err := Body.Close()
-			if err != nil {
-			}
-		}(c.Request.Body)
+	rawData, err := io.ReadAll(r.Body)
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
 		if err != nil {
-			return data, err
+			log.Println(err.Error())
 		}
-
-		err = json.Unmarshal(rawData, &data)
-
-		if err != nil {
-			return data, err
-		}
-
-		c.Set("body", data)
-		return data, nil
+	}(r.Body)
+	if err != nil {
+		return data, err
 	}
 
-	data = reqBody.(T)
+	err = json.Unmarshal(rawData, &data)
+
+	if err != nil {
+		return data, err
+	}
+
 	return data, nil
 }
 
-func SendResponse[T any](code int, data T, c *gin.Context) {
-	c.JSON(code, &gin.H{
-		"version": "0.0.1",
-		"data":    data,
-	})
+func SendResponse[T any](code int, data T, w http.ResponseWriter) {
+	bytes, err := json.Marshal(data)
+	if err != nil {
+		SendError(http.StatusInternalServerError, err.Error(), w)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(bytes)
 }
 
-func SendError[T any](code int, err T, c *gin.Context) {
-	c.AbortWithStatusJSON(code, err)
+func SendError(code int, err string, w http.ResponseWriter) {
+	w.WriteHeader(code)
+	_, _ = w.Write([]byte(err))
 }
 
 func GetTokenFromRequest(req *http.Request) (string, error) {

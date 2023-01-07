@@ -2,8 +2,8 @@ package guards
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/hramov/tg-bot-admin/internal/adapters/api/utils"
 	appError "github.com/hramov/tg-bot-admin/internal/error"
+	"github.com/hramov/tg-bot-admin/pkg/api/utils"
 	"github.com/hramov/tg-bot-admin/pkg/jwt"
 	"net/http"
 	"strconv"
