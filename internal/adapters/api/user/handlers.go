@@ -2,13 +2,12 @@ package user
 
 import (
 	"github.com/hramov/tg-bot-admin/internal/adapters/api"
-	"github.com/hramov/tg-bot-admin/internal/domain/user"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
 
 type handler struct {
-	service user.Service
+	service Service
 }
 
 const (
@@ -16,7 +15,7 @@ const (
 	registerUrl = "/api/user/register"
 )
 
-func NewHandler(service user.Service) api.Handler {
+func NewHandler(service Service) api.Handler {
 	return &handler{
 		service: service,
 	}
