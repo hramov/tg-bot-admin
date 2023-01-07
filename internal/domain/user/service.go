@@ -5,6 +5,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	appError "github.com/hramov/tg-bot-admin/internal/error"
 	"github.com/hramov/tg-bot-admin/pkg/jwt"
+	"github.com/hramov/tg-bot-admin/pkg/logging"
 	"os"
 )
 
@@ -31,10 +32,11 @@ type IService interface {
 type Service struct {
 	validator *validator.Validate
 	storage   IStorage
+	logger    *logging.Logger
 }
 
-func NewService(storage IStorage, validator *validator.Validate) IService {
-	return &Service{storage: storage, validator: validator}
+func NewService(storage IStorage, validator *validator.Validate, logger *logging.Logger) IService {
+	return &Service{storage: storage, validator: validator, logger: logger}
 }
 
 func (s *Service) Login(ctx context.Context, dto *LoginDto) (*LoginResponseDto, appError.IAppError) {
