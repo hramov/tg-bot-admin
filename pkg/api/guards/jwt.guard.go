@@ -2,6 +2,7 @@ package guards
 
 import (
 	"fmt"
+	"github.com/hramov/tg-bot-admin/internal/config"
 	appError "github.com/hramov/tg-bot-admin/internal/error"
 	"github.com/hramov/tg-bot-admin/pkg/api/utils"
 	"github.com/hramov/tg-bot-admin/pkg/jwt"
@@ -27,6 +28,7 @@ func checkRoles(roles []string, id int, params httprouter.Params) error {
 }
 
 func JwtGuard(h httprouter.Handle, roles []string) httprouter.Handle {
+	cfg := config.GetConfig()
 	return func(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		token, err := utils.GetTokenFromRequest(r)
 		if err != nil {
@@ -34,7 +36,7 @@ func JwtGuard(h httprouter.Handle, roles []string) httprouter.Handle {
 			return
 		}
 
-		data, err := jwt.TokenValid(token, jwt.AccessToken)
+		data, err := jwt.TokenValid(token, jwt.AccessToken, cfg.Jwt.Secret)
 		if err != nil {
 			utils.SendError(http.StatusUnauthorized, err.Error(), w)
 			return

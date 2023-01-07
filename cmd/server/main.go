@@ -7,18 +7,20 @@ import (
 	"github.com/hramov/tg-bot-admin/pkg/api/middleware"
 	"github.com/hramov/tg-bot-admin/pkg/db"
 	"github.com/hramov/tg-bot-admin/pkg/logging"
+	"github.com/hramov/tg-bot-admin/pkg/mail"
 	"github.com/julienschmidt/httprouter"
 	"net"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
-	"time"
 )
 
 func main() {
 	logger := logging.GetLogger()
 	cfg := config.GetConfig()
+	mail.New(cfg.Mail)
+
 	pg, err := db.DatabaseFactory(db.Postgres, cfg)
 	if err != nil {
 		logger.Fatal("cannot start postgres: %v", err)
@@ -28,7 +30,7 @@ func main() {
 	router := httprouter.New()
 	router.GlobalOPTIONS = http.HandlerFunc(middleware.Cors)
 	logger.Info("initializing user module")
-	composite.NewUser(pg, router, logger)
+	composite.NewUser(pg, router, logger, cfg)
 	start(router, cfg)
 }
 
@@ -63,8 +65,8 @@ func start(router *httprouter.Router, cfg *config.Config) {
 
 	server := &http.Server{
 		Handler:      router,
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
+		WriteTimeout: cfg.Listen.WriteTimeout,
+		ReadTimeout:  cfg.Listen.ReadTimeout,
 	}
 
 	logger.Fatal(server.Serve(listener))

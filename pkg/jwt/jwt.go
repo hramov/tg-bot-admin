@@ -3,9 +3,7 @@ package jwt
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/hramov/tg-bot-admin/internal/config"
 	"golang.org/x/crypto/bcrypt"
-	"os"
 	"strconv"
 	"time"
 )
@@ -39,9 +37,9 @@ func CheckPassword(plain string, hashed string) bool {
 	return true
 }
 
-func CreateToken(id int, secret string) (string, string, error) {
+func CreateToken(id int, secret string, accessTtl, refreshTtl time.Duration) (string, string, error) {
 	atClaims := Claims{}
-	atClaims.Exp = time.Now().Add(config.JwtAccessTime).Unix()
+	atClaims.Exp = time.Now().Add(accessTtl).Unix()
 	atClaims.Id = strconv.Itoa(id)
 
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
@@ -51,7 +49,7 @@ func CreateToken(id int, secret string) (string, string, error) {
 	}
 
 	rtClaims := Claims{}
-	rtClaims.Exp = time.Now().Add(config.JwtRefreshTime).Unix()
+	rtClaims.Exp = time.Now().Add(refreshTtl).Unix()
 	rtClaims.Id = strconv.Itoa(id)
 
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaims)
@@ -62,12 +60,12 @@ func CreateToken(id int, secret string) (string, string, error) {
 	return accessToken, refreshToken, nil
 }
 
-func VerifyToken(tokenString string, tokenType int) (*jwt.Token, error) {
+func VerifyToken(tokenString string, tokenType int, secret string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(os.Getenv("JWT_SECRET")), nil
+		return []byte(secret), nil
 	})
 
 	if err != nil {
@@ -84,8 +82,8 @@ func VerifyToken(tokenString string, tokenType int) (*jwt.Token, error) {
 	return token, nil
 }
 
-func TokenValid(tokenString string, tokenType int) (jwt.MapClaims, error) {
-	token, err := VerifyToken(tokenString, tokenType)
+func TokenValid(tokenString string, tokenType int, secret string) (jwt.MapClaims, error) {
+	token, err := VerifyToken(tokenString, tokenType, secret)
 	if err != nil {
 		return nil, err
 	}
@@ -93,8 +91,8 @@ func TokenValid(tokenString string, tokenType int) (jwt.MapClaims, error) {
 	return token.Claims.(jwt.MapClaims), nil
 }
 
-func CheckRefreshToken(t string) (int, error) {
-	token, err := VerifyToken(t, 1)
+func CheckRefreshToken(t string, secret string) (int, error) {
+	token, err := VerifyToken(t, 1, secret)
 	if err != nil {
 		return 0, err
 	}

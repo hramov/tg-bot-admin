@@ -4,3 +4,4 @@ data/
 internal/config/*_test.config.go
 bin/
 bash/
+config.yml

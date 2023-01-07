@@ -26,10 +26,10 @@ func Connect(cfg *config.Config) (*Postgres, error) {
 		return nil, err
 	}
 
-	db.SetMaxOpenConns(config.MaxOpenConns)
-	db.SetMaxIdleConns(config.MaxIdleConns)
-	db.SetConnMaxIdleTime(config.ConnMaxIdleTime)
-	db.SetConnMaxLifetime(config.ConnMaxLifetime)
+	db.SetMaxOpenConns(cfg.Storage.MaxOpenCons)
+	db.SetMaxIdleConns(cfg.Storage.MaxIdleCons)
+	db.SetConnMaxIdleTime(cfg.Storage.ConnMaxIdleTime)
+	db.SetConnMaxLifetime(cfg.Storage.ConnMaxLifetime)
 
 	err = initDb.Start(db)
 	if err != nil {

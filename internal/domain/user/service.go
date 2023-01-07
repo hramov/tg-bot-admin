@@ -3,10 +3,10 @@ package user
 import (
 	"context"
 	"github.com/go-playground/validator/v10"
+	"github.com/hramov/tg-bot-admin/internal/config"
 	appError "github.com/hramov/tg-bot-admin/internal/error"
 	"github.com/hramov/tg-bot-admin/pkg/jwt"
 	"github.com/hramov/tg-bot-admin/pkg/logging"
-	"os"
 )
 
 type IStorage interface {
@@ -33,10 +33,11 @@ type Service struct {
 	validator *validator.Validate
 	storage   IStorage
 	logger    *logging.Logger
+	cfg       *config.Config
 }
 
-func NewService(storage IStorage, validator *validator.Validate, logger *logging.Logger) IService {
-	return &Service{storage: storage, validator: validator, logger: logger}
+func NewService(storage IStorage, validator *validator.Validate, logger *logging.Logger, cfg *config.Config) IService {
+	return &Service{storage: storage, validator: validator, logger: logger, cfg: cfg}
 }
 
 func (s *Service) Login(ctx context.Context, dto *LoginDto) (*LoginResponseDto, appError.IAppError) {
@@ -52,7 +53,7 @@ func (s *Service) Login(ctx context.Context, dto *LoginDto) (*LoginResponseDto, 
 	if !valid {
 		return nil, appError.LoginOrPasswordIncorrectError()
 	}
-	at, rt, err := jwt.CreateToken(user.Id, os.Getenv("JWT_SECRET"))
+	at, rt, err := jwt.CreateToken(user.Id, s.cfg.Jwt.Secret, s.cfg.Jwt.AccessTtl, s.cfg.Jwt.RefreshTtl)
 	if err != nil {
 		return nil, appError.CreateTokenError()
 	}
@@ -63,7 +64,7 @@ func (s *Service) Login(ctx context.Context, dto *LoginDto) (*LoginResponseDto, 
 }
 
 func (s *Service) Refresh(ctx context.Context, dto *LoginResponseDto) (*LoginResponseDto, appError.IAppError) {
-	id, err := jwt.CheckRefreshToken(dto.RefreshToken)
+	id, err := jwt.CheckRefreshToken(dto.RefreshToken, s.cfg.Jwt.Secret)
 	if err != nil {
 		return nil, appError.RefreshTokenIsInvalidError()
 	}
@@ -74,7 +75,7 @@ func (s *Service) Refresh(ctx context.Context, dto *LoginResponseDto) (*LoginRes
 	if user.Id == 0 {
 		return nil, appError.NoUserFoundError()
 	}
-	at, rt, err := jwt.CreateToken(user.Id, os.Getenv("JWT_SECRET"))
+	at, rt, err := jwt.CreateToken(user.Id, s.cfg.Jwt.Secret, s.cfg.Jwt.AccessTtl, s.cfg.Jwt.RefreshTtl)
 	if err != nil {
 		return nil, appError.CreateTokenError()
 	}

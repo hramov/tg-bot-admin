@@ -5,14 +5,15 @@ import (
 	"github.com/hramov/tg-bot-admin/internal/adapters/api/user"
 	"github.com/hramov/tg-bot-admin/internal/adapters/db"
 	user2 "github.com/hramov/tg-bot-admin/internal/adapters/db/user"
+	"github.com/hramov/tg-bot-admin/internal/config"
 	user3 "github.com/hramov/tg-bot-admin/internal/domain/user"
 	"github.com/hramov/tg-bot-admin/pkg/logging"
 	"github.com/julienschmidt/httprouter"
 )
 
-func NewUser(pg db.Connector, router *httprouter.Router, logger *logging.Logger) {
+func NewUser(pg db.Connector, router *httprouter.Router, logger *logging.Logger, cfg *config.Config) {
 	storage := user2.NewStorage(pg)
-	service := user3.NewService(storage, validator.New(), logger)
+	service := user3.NewService(storage, validator.New(), logger, cfg)
 	handler := user.NewHandler(service)
 	handler.Init(router)
 }
