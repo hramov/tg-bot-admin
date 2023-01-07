@@ -13,7 +13,7 @@ type userStorage struct {
 	db db.Connector
 }
 
-func NewStorage(db db.Connector) user.Storage {
+func NewStorage(db db.Connector) user.IStorage {
 	return &userStorage{db: db}
 }
 

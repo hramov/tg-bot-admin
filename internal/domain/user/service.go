@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-type Storage interface {
+type IStorage interface {
 	GetBy(ctx context.Context, field string, param any) (*User, error)
 	GetById(ctx context.Context, id int) (*User, error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
@@ -30,10 +30,10 @@ type IService interface {
 
 type Service struct {
 	validator *validator.Validate
-	storage   Storage
+	storage   IStorage
 }
 
-func NewService(storage Storage, validator *validator.Validate) IService {
+func NewService(storage IStorage, validator *validator.Validate) IService {
 	return &Service{storage: storage, validator: validator}
 }
 
