@@ -33,3 +33,10 @@ func NotImplementedError() IAppError {
 		message:    "Method not implement",
 	}
 }
+
+func ValidationError(err error) IAppError {
+	return &AppError{
+		statusCode: http.StatusBadRequest,
+		message:    err.Error(),
+	}
+}
