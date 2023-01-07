@@ -1,39 +1,12 @@
 package user
 
 import (
-	"github.com/hramov/tg-bot-admin/internal/adapters/api"
 	"github.com/hramov/tg-bot-admin/internal/domain/user"
 	"github.com/hramov/tg-bot-admin/pkg/api/utils"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"strconv"
 )
-
-type handler struct {
-	service user.IService
-}
-
-const (
-	loginUrl    = "/api/user/login"
-	registerUrl = "/api/user/register"
-	usersUrl    = "/api/user"
-	userUrl     = "/api/user/:user_id"
-)
-
-func NewHandler(service user.IService) api.Handler {
-	return &handler{
-		service: service,
-	}
-}
-
-func (h *handler) Init(router *httprouter.Router) {
-	router.POST(loginUrl, h.Login)
-	router.GET(registerUrl, h.Register)
-	router.GET(usersUrl, h.Get)
-	router.GET(userUrl, h.GetOne)
-	router.PUT(userUrl, h.Update)
-	router.DELETE(userUrl, h.Delete)
-}
 
 func (h *handler) Login(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	body, err := utils.GetBody[user.LoginDto](r)

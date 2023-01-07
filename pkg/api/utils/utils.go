@@ -67,21 +67,8 @@ func GetTokenFromRequest(req *http.Request) (string, error) {
 	return "", fmt.Errorf("wo auth header")
 }
 
-func GetTokenFromContext(c *gin.Context) (string, error) {
-	req, _ := GetReqResFromContext(c)
-	return GetTokenFromRequest(req)
-}
-
 func GetReqResFromContext(c *gin.Context) (*http.Request, *http.Response) {
 	return c.Request, c.Request.Response
-}
-
-func GetParam(name string, c *gin.Context) string {
-	return c.Param(name)
-}
-
-func GetQuery(name string, c *gin.Context) string {
-	return c.Query(name)
 }
 
 func IsEqualClientIp(serviceIp, clientIp string) (bool, error) {

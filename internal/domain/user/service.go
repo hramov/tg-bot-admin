@@ -68,11 +68,11 @@ func (s *Service) GetAll(ctx context.Context, limit, offset int) ([]*User, appEr
 }
 
 func (s *Service) GetById(ctx context.Context, id int) (*User, appError.IAppError) {
-	users, err := s.storage.GetBy(ctx, "id", id)
+	user, err := s.storage.GetBy(ctx, "id", id)
 	if err != nil {
 		return nil, appError.DatabaseError(err)
 	}
-	return users, nil
+	return user, nil
 }
 
 func (s *Service) Create(ctx context.Context, dto *CreateDto) (*int, appError.IAppError) {
