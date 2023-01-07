@@ -1,14 +1,11 @@
 package utils
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"io"
 	"log"
 	"net/http"
-	"net/url"
 	"strings"
 )
 
@@ -43,7 +40,7 @@ func SendResponse[T any](code int, data T, w http.ResponseWriter) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(code)
 	_, _ = w.Write(bytes)
 }
 
@@ -65,30 +62,4 @@ func GetTokenFromRequest(req *http.Request) (string, error) {
 		return "", fmt.Errorf("wrong auth header format")
 	}
 	return "", fmt.Errorf("wo auth header")
-}
-
-func GetReqResFromContext(c *gin.Context) (*http.Request, *http.Response) {
-	return c.Request, c.Request.Response
-}
-
-func IsEqualClientIp(serviceIp, clientIp string) (bool, error) {
-	ip := ""
-	u, err := url.Parse(serviceIp)
-	if err != nil {
-		return false, err
-	}
-
-	if u.Hostname() == "localhost" {
-		ip = "127.0.0.1"
-	} else {
-		ip = u.Hostname()
-	}
-
-	return ip == clientIp, nil
-
-}
-
-func MaintainRequest(requestCtx context.Context, cancel context.CancelFunc) {
-	<-requestCtx.Done()
-	cancel()
 }

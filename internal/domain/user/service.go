@@ -30,6 +30,7 @@ type IService interface {
 	Update(ctx context.Context, dto *UpdateDto) (*int, appError.IAppError)
 	Delete(ctx context.Context, id int) (*int, appError.IAppError)
 	Login(ctx context.Context, dto *LoginDto) (*LoginResponseDto, appError.IAppError)
+	Refresh(ctx context.Context, dto *LoginResponseDto) (*LoginResponseDto, appError.IAppError)
 }
 
 func NewService(storage Storage, validator *validator.Validate) IService {
@@ -48,6 +49,28 @@ func (s *Service) Login(ctx context.Context, dto *LoginDto) (*LoginResponseDto, 
 	valid := jwt.CheckPassword(dto.Password, user.Password)
 	if !valid {
 		return nil, appError.LoginOrPasswordIncorrectError()
+	}
+	at, rt, err := jwt.CreateToken(user.Id, os.Getenv("JWT_SECRET"))
+	if err != nil {
+		return nil, appError.CreateTokenError()
+	}
+	return &LoginResponseDto{
+		AccessToken:  at,
+		RefreshToken: rt,
+	}, nil
+}
+
+func (s *Service) Refresh(ctx context.Context, dto *LoginResponseDto) (*LoginResponseDto, appError.IAppError) {
+	id, err := jwt.CheckRefreshToken(dto.RefreshToken)
+	if err != nil {
+		return nil, appError.RefreshTokenIsInvalidError()
+	}
+	user, err := s.storage.GetBy(ctx, "id", id)
+	if err != nil {
+		return nil, appError.DatabaseError(err)
+	}
+	if user.Id == 0 {
+		return nil, appError.NoUserFoundError()
 	}
 	at, rt, err := jwt.CreateToken(user.Id, os.Getenv("JWT_SECRET"))
 	if err != nil {

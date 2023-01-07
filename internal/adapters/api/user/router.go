@@ -14,6 +14,7 @@ type handler struct {
 const (
 	loginUrl    = "/api/login"
 	registerUrl = "/api/register"
+	refreshUrl  = "/api/refresh"
 	usersUrl    = "/api/users"
 	userUrl     = "/api/user/:user_id"
 )
@@ -25,10 +26,11 @@ func NewHandler(service user.IService) api.Handler {
 }
 
 func (h *handler) Init(router *httprouter.Router) {
-	router.POST(loginUrl, h.Login)
 	router.GET(registerUrl, h.Register)
 	router.GET(usersUrl, guards.JwtGuard(h.Get, []string{"admin"}))
 	router.GET(userUrl, guards.JwtGuard(h.GetOne, []string{"admin", "equal_id"}))
+	router.POST(loginUrl, h.Login)
+	router.POST(refreshUrl, h.Refresh)
 	router.PUT(userUrl, guards.JwtGuard(h.Update, []string{"admin", "equal_id"}))
 	router.DELETE(userUrl, guards.JwtGuard(h.Delete, []string{"admin", "equal_id"}))
 }

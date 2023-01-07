@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/hramov/tg-bot-admin/internal/config"
 	initDb "github.com/hramov/tg-bot-admin/pkg/client/postgres/init"
-	"github.com/hramov/tg-bot-admin/pkg/logger"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"os"
@@ -35,7 +34,6 @@ func Connect() (*Postgres, error) {
 
 	err = initDb.Start(db)
 	if err != nil {
-		logger.Instance.Error(err.Error())
 		return nil, err
 	}
 

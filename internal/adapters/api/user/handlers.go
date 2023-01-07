@@ -22,6 +22,20 @@ func (h *handler) Login(w http.ResponseWriter, r *http.Request, params httproute
 	utils.SendResponse(http.StatusOK, serviceResponse, w)
 }
 
+func (h *handler) Refresh(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	body, err := utils.GetBody[user.LoginResponseDto](r)
+	if err != nil {
+		utils.SendError(http.StatusBadRequest, "cannot parse body", w)
+		return
+	}
+	serviceResponse, serviceError := h.service.Refresh(r.Context(), &body)
+	if serviceError != nil {
+		utils.SendError(serviceError.Status(), serviceError.Error(), w)
+		return
+	}
+	utils.SendResponse(http.StatusOK, serviceResponse, w)
+}
+
 func (h *handler) Register(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	body, err := utils.GetBody[user.CreateDto](r)
 	if err != nil {

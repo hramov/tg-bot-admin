@@ -5,7 +5,6 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/hramov/tg-bot-admin/internal/config"
 	"golang.org/x/crypto/bcrypt"
-	"math/rand"
 	"os"
 	"strconv"
 	"time"
@@ -113,43 +112,4 @@ func CheckRefreshToken(t string) (int, error) {
 		return 0, err
 	}
 	return id, nil
-}
-
-func CreateClientId() string {
-	rand.Seed(time.Now().UnixNano())
-	time.Sleep(1 * time.Nanosecond)
-	const letterBytes = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ."
-	b := make([]byte, 15)
-	for i := range b {
-		b[i] = letterBytes[rand.Intn(len(letterBytes))]
-	}
-	return string(b)
-}
-
-func CreateClientSecret() (string, error) {
-	rand.Seed(time.Now().UnixNano())
-	time.Sleep(1 * time.Nanosecond)
-	const letterBytes = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ."
-	b := make([]byte, 15)
-	for i := range b {
-		b[i] = letterBytes[rand.Intn(len(letterBytes))]
-	}
-	return CreateHashedPassword(string(b))
-}
-
-func CreateJWTSecret() (string, error) {
-	rand.Seed(time.Now().UnixNano())
-	time.Sleep(1 * time.Nanosecond)
-	return "", nil
-}
-
-func CreateAuthCode() string {
-	rand.Seed(time.Now().UnixNano())
-	time.Sleep(1 * time.Nanosecond)
-	const letterBytes = "1234567890"
-	b := make([]byte, 7)
-	for i := range b {
-		b[i] = letterBytes[rand.Intn(len(letterBytes))]
-	}
-	return string(b)
 }
