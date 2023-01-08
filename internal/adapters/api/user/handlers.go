@@ -1,6 +1,8 @@
 package user
 
 import (
+	"context"
+	"github.com/hramov/tg-bot-admin/internal/config"
 	"github.com/hramov/tg-bot-admin/internal/domain/user"
 	"github.com/hramov/tg-bot-admin/pkg/http/utils"
 	"github.com/julienschmidt/httprouter"
@@ -23,7 +25,11 @@ func (h *handler) Login(w http.ResponseWriter, r *http.Request, params httproute
 		utils.SendError(http.StatusBadRequest, "cannot parse body", w)
 		return
 	}
-	serviceResponse, serviceError := h.service.Login(r.Context(), &body)
+
+	ctx, cancel := context.WithTimeout(r.Context(), config.DefaultTimeout)
+	defer cancel()
+
+	serviceResponse, serviceError := h.service.Login(ctx, &body)
 	if serviceError != nil {
 		utils.SendError(serviceError.Status(), serviceError.Error(), w)
 		return
@@ -46,7 +52,11 @@ func (h *handler) Refresh(w http.ResponseWriter, r *http.Request, params httprou
 		utils.SendError(http.StatusBadRequest, "cannot parse body", w)
 		return
 	}
-	serviceResponse, serviceError := h.service.Refresh(r.Context(), &body)
+
+	ctx, cancel := context.WithTimeout(r.Context(), config.DefaultTimeout)
+	defer cancel()
+
+	serviceResponse, serviceError := h.service.Refresh(ctx, &body)
 	if serviceError != nil {
 		utils.SendError(serviceError.Status(), serviceError.Error(), w)
 		return
@@ -69,7 +79,11 @@ func (h *handler) Register(w http.ResponseWriter, r *http.Request, params httpro
 		utils.SendError(http.StatusBadRequest, "cannot parse body", w)
 		return
 	}
-	serviceResponse, serviceError := h.service.Create(r.Context(), &body)
+
+	ctx, cancel := context.WithTimeout(r.Context(), config.DefaultTimeout)
+	defer cancel()
+
+	serviceResponse, serviceError := h.service.Create(ctx, &body)
 	if serviceError != nil {
 		utils.SendError(serviceError.Status(), serviceError.Error(), w)
 		return
@@ -89,7 +103,10 @@ func (h *handler) Register(w http.ResponseWriter, r *http.Request, params httpro
 // @Failure 500
 // @Router /api/users/:limit/:offset [get]
 func (h *handler) Get(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	users, err := h.service.GetAll(r.Context(), 10, 0)
+	ctx, cancel := context.WithTimeout(r.Context(), config.DefaultTimeout)
+	defer cancel()
+
+	users, err := h.service.GetAll(ctx, 10, 0)
 	if err != nil {
 		utils.SendError(http.StatusInternalServerError, err.Error(), w)
 		return
@@ -115,7 +132,11 @@ func (h *handler) Delete(w http.ResponseWriter, r *http.Request, params httprout
 		utils.SendError(http.StatusBadRequest, "wrong id format", w)
 		return
 	}
-	users, err := h.service.Delete(r.Context(), id)
+
+	ctx, cancel := context.WithTimeout(r.Context(), config.DefaultTimeout)
+	defer cancel()
+
+	users, err := h.service.Delete(ctx, id)
 	if err != nil {
 		utils.SendError(http.StatusInternalServerError, err.Error(), w)
 		return
@@ -140,7 +161,11 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 		utils.SendError(http.StatusBadRequest, "cannot parse body", w)
 		return
 	}
-	serviceResponse, serviceError := h.service.Update(r.Context(), &body)
+
+	ctx, cancel := context.WithTimeout(r.Context(), config.DefaultTimeout)
+	defer cancel()
+
+	serviceResponse, serviceError := h.service.Update(ctx, &body)
 	if serviceError != nil {
 		utils.SendError(serviceError.Status(), serviceError.Error(), w)
 		return
@@ -165,7 +190,11 @@ func (h *handler) GetOne(w http.ResponseWriter, r *http.Request, params httprout
 		utils.SendError(http.StatusBadRequest, "wrong id format", w)
 		return
 	}
-	users, err := h.service.GetById(r.Context(), id)
+
+	ctx, cancel := context.WithTimeout(r.Context(), config.DefaultTimeout)
+	defer cancel()
+
+	users, err := h.service.GetById(ctx, id)
 	if err != nil {
 		utils.SendError(http.StatusInternalServerError, err.Error(), w)
 		return

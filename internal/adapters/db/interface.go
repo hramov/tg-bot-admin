@@ -11,4 +11,5 @@ type Mapper[T any] interface {
 
 type Connector interface {
 	GetConn(ctx context.Context) (*sqlx.Conn, error)
+	ReturnConn(ctx context.Context, conn *sqlx.Conn)
 }

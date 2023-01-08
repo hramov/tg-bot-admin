@@ -5,17 +5,20 @@ import (
 	"fmt"
 	"github.com/hramov/tg-bot-admin/internal/config"
 	initDb "github.com/hramov/tg-bot-admin/pkg/db/postgres/init"
+	"github.com/hramov/tg-bot-admin/pkg/logging"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"log"
 )
 
 type Postgres struct {
-	db *sqlx.DB
+	db     *sqlx.DB
+	logger *logging.Logger
 }
 
 var instance *Postgres
 
-func Connect(cfg *config.Config) (*Postgres, error) {
+func Connect(cfg *config.Config, logger *logging.Logger) (*Postgres, error) {
 	if instance != nil {
 		return instance, nil
 	}
@@ -37,6 +40,7 @@ func Connect(cfg *config.Config) (*Postgres, error) {
 	}
 
 	instance.db = db
+	instance.logger = logger
 	return instance, nil
 }
 
@@ -46,6 +50,7 @@ func Disconnect() {
 	}
 	err := instance.db.Close()
 	if err != nil {
+		log.Println(err.Error())
 	}
 	instance = nil
 }
@@ -65,9 +70,26 @@ func (p *Postgres) GetConn(ctx context.Context) (*sqlx.Conn, error) {
 }
 
 func (p *Postgres) getConnection(ctx context.Context) (*sqlx.Conn, error) {
-	conn, err := instance.db.Connx(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("cannot get connection from pool: %v", err)
+	select {
+	case <-ctx.Done():
+		return nil, fmt.Errorf("context is already cancelled")
+	default:
+		conn, err := instance.db.Connx(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("cannot get connection from pool: %v", err)
+		}
+		return conn, nil
 	}
-	return conn, nil
+}
+
+func (p *Postgres) ReturnConn(ctx context.Context, conn *sqlx.Conn) {
+	select {
+	case <-ctx.Done():
+		return
+	default:
+		err := conn.Close()
+		if err != nil {
+			p.logger.Error(err.Error())
+		}
+	}
 }

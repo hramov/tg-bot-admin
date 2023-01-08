@@ -26,7 +26,7 @@ func initRouter(logger *logging.Logger) *httprouter.Router {
 
 func initPostgres(cfg *config.Config, logger *logging.Logger) db2.Connector {
 	logger.Info("create postgres connection")
-	pg, err := db.DatabaseFactory(db.Postgres, cfg)
+	pg, err := db.DatabaseFactory(db.Postgres, cfg, logger)
 	if err != nil {
 		logger.Fatal("cannot start postgres: %v", err)
 		os.Exit(1)

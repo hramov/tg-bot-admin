@@ -4,11 +4,13 @@ import (
 	"github.com/hramov/tg-bot-admin/internal/adapters/api"
 	"github.com/hramov/tg-bot-admin/internal/domain/user"
 	"github.com/hramov/tg-bot-admin/pkg/http/guards"
+	"github.com/hramov/tg-bot-admin/pkg/logging"
 	"github.com/julienschmidt/httprouter"
 )
 
 type handler struct {
 	service user.IService
+	logger  *logging.Logger
 }
 
 const (
@@ -19,9 +21,10 @@ const (
 	userUrl     = "/api/user/:user_id"
 )
 
-func NewHandler(service user.IService) api.Handler {
+func NewHandler(logger *logging.Logger, service user.IService) api.Handler {
 	return &handler{
 		service: service,
+		logger:  logger,
 	}
 }
 
