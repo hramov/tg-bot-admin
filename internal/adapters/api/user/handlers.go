@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/hramov/tg-bot-admin/internal/domain/user"
-	"github.com/hramov/tg-bot-admin/pkg/api/utils"
+	"github.com/hramov/tg-bot-admin/pkg/http/utils"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"strconv"

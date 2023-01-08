@@ -53,7 +53,7 @@ func (s *Service) Login(ctx context.Context, dto *LoginDto) (*LoginResponseDto, 
 	if !valid {
 		return nil, appError.LoginOrPasswordIncorrectError()
 	}
-	at, rt, err := jwt.CreateToken(user.Id, s.cfg.Jwt.Secret, s.cfg.Jwt.AccessTtl, s.cfg.Jwt.RefreshTtl)
+	at, rt, err := jwt.CreateToken(user.Id, s.cfg.Jwt.AccessSecret, s.cfg.Jwt.RefreshSecret, s.cfg.Jwt.AccessTtl, s.cfg.Jwt.RefreshTtl)
 	if err != nil {
 		return nil, appError.CreateTokenError()
 	}
@@ -64,7 +64,7 @@ func (s *Service) Login(ctx context.Context, dto *LoginDto) (*LoginResponseDto, 
 }
 
 func (s *Service) Refresh(ctx context.Context, dto *LoginResponseDto) (*LoginResponseDto, appError.IAppError) {
-	id, err := jwt.CheckRefreshToken(dto.RefreshToken, s.cfg.Jwt.Secret)
+	id, err := jwt.CheckRefreshToken(dto.RefreshToken, s.cfg.Jwt.RefreshSecret)
 	if err != nil {
 		return nil, appError.RefreshTokenIsInvalidError()
 	}
@@ -75,7 +75,7 @@ func (s *Service) Refresh(ctx context.Context, dto *LoginResponseDto) (*LoginRes
 	if user.Id == 0 {
 		return nil, appError.NoUserFoundError()
 	}
-	at, rt, err := jwt.CreateToken(user.Id, s.cfg.Jwt.Secret, s.cfg.Jwt.AccessTtl, s.cfg.Jwt.RefreshTtl)
+	at, rt, err := jwt.CreateToken(user.Id, s.cfg.Jwt.AccessSecret, s.cfg.Jwt.RefreshSecret, s.cfg.Jwt.AccessTtl, s.cfg.Jwt.RefreshTtl)
 	if err != nil {
 		return nil, appError.CreateTokenError()
 	}

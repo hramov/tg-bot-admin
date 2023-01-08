@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/hramov/tg-bot-admin/internal/config"
 	appError "github.com/hramov/tg-bot-admin/internal/error"
-	"github.com/hramov/tg-bot-admin/pkg/api/utils"
+	"github.com/hramov/tg-bot-admin/pkg/http/utils"
 	"github.com/hramov/tg-bot-admin/pkg/jwt"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
@@ -36,7 +36,7 @@ func JwtGuard(h httprouter.Handle, roles []string) httprouter.Handle {
 			return
 		}
 
-		data, err := jwt.TokenValid(token, jwt.AccessToken, cfg.Jwt.Secret)
+		data, err := jwt.TokenValid(token, cfg.Jwt.AccessSecret)
 		if err != nil {
 			utils.SendError(http.StatusUnauthorized, err.Error(), w)
 			return

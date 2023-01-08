@@ -16,11 +16,6 @@ type Claims struct {
 
 func (c Claims) Valid() error { return nil } // TODO
 
-const (
-	AccessToken = iota
-	RefreshToken
-)
-
 func CreateHashedPassword(plain string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(plain), 10)
 	if err != nil {
@@ -37,13 +32,13 @@ func CheckPassword(plain string, hashed string) bool {
 	return true
 }
 
-func CreateToken(id int, secret string, accessTtl, refreshTtl time.Duration) (string, string, error) {
+func CreateToken(id int, accessSecret, refreshSecret string, accessTtl, refreshTtl time.Duration) (string, string, error) {
 	atClaims := Claims{}
 	atClaims.Exp = time.Now().Add(accessTtl).Unix()
 	atClaims.Id = strconv.Itoa(id)
 
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
-	accessToken, err := at.SignedString([]byte(secret))
+	accessToken, err := at.SignedString([]byte(accessSecret))
 	if err != nil {
 		return "", "", err
 	}
@@ -53,14 +48,14 @@ func CreateToken(id int, secret string, accessTtl, refreshTtl time.Duration) (st
 	rtClaims.Id = strconv.Itoa(id)
 
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaims)
-	refreshToken, err := rt.SignedString([]byte(secret))
+	refreshToken, err := rt.SignedString([]byte(refreshSecret))
 	if err != nil {
 		return "", "", err
 	}
 	return accessToken, refreshToken, nil
 }
 
-func VerifyToken(tokenString string, tokenType int, secret string) (*jwt.Token, error) {
+func VerifyToken(tokenString string, secret string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -82,8 +77,8 @@ func VerifyToken(tokenString string, tokenType int, secret string) (*jwt.Token, 
 	return token, nil
 }
 
-func TokenValid(tokenString string, tokenType int, secret string) (jwt.MapClaims, error) {
-	token, err := VerifyToken(tokenString, tokenType, secret)
+func TokenValid(tokenString string, secret string) (jwt.MapClaims, error) {
+	token, err := VerifyToken(tokenString, secret)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +87,7 @@ func TokenValid(tokenString string, tokenType int, secret string) (jwt.MapClaims
 }
 
 func CheckRefreshToken(t string, secret string) (int, error) {
-	token, err := VerifyToken(t, 1, secret)
+	token, err := VerifyToken(t, secret)
 	if err != nil {
 		return 0, err
 	}

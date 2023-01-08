@@ -3,7 +3,7 @@ package user
 import (
 	"github.com/hramov/tg-bot-admin/internal/adapters/api"
 	"github.com/hramov/tg-bot-admin/internal/domain/user"
-	"github.com/hramov/tg-bot-admin/pkg/api/guards"
+	"github.com/hramov/tg-bot-admin/pkg/http/guards"
 	"github.com/julienschmidt/httprouter"
 )
 

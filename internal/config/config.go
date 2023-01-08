@@ -40,9 +40,10 @@ type CorsConfig struct {
 }
 
 type JwtConfig struct {
-	AccessTtl  time.Duration `yaml:"access_ttl"`
-	RefreshTtl time.Duration `yaml:"refresh_ttl"`
-	Secret     string        `yaml:"secret"`
+	AccessTtl     time.Duration `yaml:"access_ttl"`
+	RefreshTtl    time.Duration `yaml:"refresh_ttl"`
+	AccessSecret  string        `yaml:"access_secret"`
+	RefreshSecret string        `yaml:"refresh_secret"`
 }
 
 type MailConfig struct {

@@ -19,17 +19,6 @@ import (
 	"path/filepath"
 )
 
-func main() {
-	logger := logging.GetLogger()
-	cfg := config.GetConfig()
-	mail.New(cfg.Mail)
-	pg := initPostgres(cfg, logger)
-	router := initRouter(logger)
-	initSwagger(logger, router)
-	initModules(logger, router, cfg, pg)
-	start(router, cfg, logger)
-}
-
 func initRouter(logger *logging.Logger) *httprouter.Router {
 	logger.Info("create router")
 	return httprouter.New()
@@ -101,4 +90,15 @@ func start(router *httprouter.Router, cfg *config.Config, logger *logging.Logger
 	}
 
 	logger.Fatal(server.Serve(listener))
+}
+
+func main() {
+	logger := logging.GetLogger()
+	cfg := config.GetConfig()
+	mail.New(cfg.Mail)
+	pg := initPostgres(cfg, logger)
+	router := initRouter(logger)
+	initSwagger(logger, router)
+	initModules(logger, router, cfg, pg)
+	start(router, cfg, logger)
 }
