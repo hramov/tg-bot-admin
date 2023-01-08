@@ -11,7 +11,9 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func NewUser(pg db.Connector, router *httprouter.Router, logger *logging.Logger, cfg *config.Config) {
+type UserComposite struct{}
+
+func (uc *UserComposite) Register(logger *logging.Logger, cfg *config.Config, pg db.Connector, router *httprouter.Router) {
 	storage := user2.NewStorage(pg)
 	service := user3.NewService(storage, validator.New(), logger, cfg)
 	handler := user.NewHandler(service)

@@ -1,0 +1,13 @@
+POST http://localhost:4000/api/login
+Content-Type: application/json
+
+{
+  "email": "trykhramov@gmail.com",
+  "password": "admin"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
