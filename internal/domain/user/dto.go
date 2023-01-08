@@ -1,8 +1,8 @@
 package user
 
 type LoginDto struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
 }
 
 type CreateDto struct {
@@ -18,4 +18,9 @@ type CreateDto struct {
 type UpdateDto struct {
 	Id int `json:"id"`
 	CreateDto
+}
+
+type LoginResponseDto struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }

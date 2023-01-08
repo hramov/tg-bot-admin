@@ -7,5 +7,5 @@ build_windows:
 build_linux:
 	CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-extldflags "-static"' -o ./bin/server ./src/main.go
 
-ui:
-	cd ./src/dashboard && npm run dev
+swagger:
+	swag init -g cmd/server/main.go -o ./docs

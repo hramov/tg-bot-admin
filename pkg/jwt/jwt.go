@@ -3,26 +3,24 @@ package jwt
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/hramov/tg-bot-admin/internal/config"
 	"golang.org/x/crypto/bcrypt"
-	"math/rand"
-	"os"
 	"strconv"
 	"time"
 )
 
 type Claims struct {
-	Id    string `json:"jti,omitempty"`
-	Email string `json:"email"`
-	Exp   int64  `json:"exp"`
+	Id          string      `json:"jti,omitempty"`
+	Email       string      `json:"email"`
+	Exp         int64       `json:"exp"`
+	Permissions Permissions `json:"permissions"`
+}
+
+type Permissions struct {
+	Admin bool     `json:"admin"`
+	Scope []string `json:"scope"`
 }
 
 func (c Claims) Valid() error { return nil } // TODO
-
-const (
-	AccessToken = iota
-	RefreshToken
-)
 
 func CreateHashedPassword(plain string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(plain), 10)
@@ -40,35 +38,36 @@ func CheckPassword(plain string, hashed string) bool {
 	return true
 }
 
-func CreateToken(id int, secret string) (string, string, error) {
+func CreateToken(id int, perm Permissions, accessSecret, refreshSecret string, accessTtl, refreshTtl time.Duration) (string, string, error) {
 	atClaims := Claims{}
-	atClaims.Exp = time.Now().Add(config.JwtAccessTime).Unix()
+	atClaims.Exp = time.Now().Add(accessTtl).Unix()
 	atClaims.Id = strconv.Itoa(id)
+	atClaims.Permissions = perm
 
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
-	accessToken, err := at.SignedString([]byte(secret))
+	accessToken, err := at.SignedString([]byte(accessSecret))
 	if err != nil {
 		return "", "", err
 	}
 
 	rtClaims := Claims{}
-	rtClaims.Exp = time.Now().Add(config.JwtRefreshTime).Unix()
+	rtClaims.Exp = time.Now().Add(refreshTtl).Unix()
 	rtClaims.Id = strconv.Itoa(id)
 
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaims)
-	refreshToken, err := rt.SignedString([]byte(secret))
+	refreshToken, err := rt.SignedString([]byte(refreshSecret))
 	if err != nil {
 		return "", "", err
 	}
 	return accessToken, refreshToken, nil
 }
 
-func VerifyToken(tokenString string, tokenType int) (*jwt.Token, error) {
+func VerifyToken(tokenString string, secret string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(os.Getenv("JWT_SECRET")), nil
+		return []byte(secret), nil
 	})
 
 	if err != nil {
@@ -85,8 +84,8 @@ func VerifyToken(tokenString string, tokenType int) (*jwt.Token, error) {
 	return token, nil
 }
 
-func TokenValid(tokenString string, tokenType int) (jwt.MapClaims, error) {
-	token, err := VerifyToken(tokenString, tokenType)
+func TokenValid(tokenString string, secret string) (jwt.MapClaims, error) {
+	token, err := VerifyToken(tokenString, secret)
 	if err != nil {
 		return nil, err
 	}
@@ -94,8 +93,8 @@ func TokenValid(tokenString string, tokenType int) (jwt.MapClaims, error) {
 	return token.Claims.(jwt.MapClaims), nil
 }
 
-func CheckRefreshToken(t string) (int, error) {
-	token, err := VerifyToken(t, 1)
+func CheckRefreshToken(t string, secret string) (int, error) {
+	token, err := VerifyToken(t, secret)
 	if err != nil {
 		return 0, err
 	}
@@ -113,43 +112,4 @@ func CheckRefreshToken(t string) (int, error) {
 		return 0, err
 	}
 	return id, nil
-}
-
-func CreateClientId() string {
-	rand.Seed(time.Now().UnixNano())
-	time.Sleep(1 * time.Nanosecond)
-	const letterBytes = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ."
-	b := make([]byte, 15)
-	for i := range b {
-		b[i] = letterBytes[rand.Intn(len(letterBytes))]
-	}
-	return string(b)
-}
-
-func CreateClientSecret() (string, error) {
-	rand.Seed(time.Now().UnixNano())
-	time.Sleep(1 * time.Nanosecond)
-	const letterBytes = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ."
-	b := make([]byte, 15)
-	for i := range b {
-		b[i] = letterBytes[rand.Intn(len(letterBytes))]
-	}
-	return CreateHashedPassword(string(b))
-}
-
-func CreateJWTSecret() (string, error) {
-	rand.Seed(time.Now().UnixNano())
-	time.Sleep(1 * time.Nanosecond)
-	return "", nil
-}
-
-func CreateAuthCode() string {
-	rand.Seed(time.Now().UnixNano())
-	time.Sleep(1 * time.Nanosecond)
-	const letterBytes = "1234567890"
-	b := make([]byte, 7)
-	for i := range b {
-		b[i] = letterBytes[rand.Intn(len(letterBytes))]
-	}
-	return string(b)
 }
