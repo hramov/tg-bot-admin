@@ -3,10 +3,14 @@ package user
 import (
 	"database/sql"
 	"github.com/hramov/tg-bot-admin/internal/domain/user"
+	"github.com/hramov/tg-bot-admin/pkg/db/postgres/init/types"
+	"github.com/hramov/tg-bot-admin/pkg/jwt"
 )
 
 type UsersModel struct {
 	Id           int
+	Role         int
+	Permissions  types.NullSqlObject[jwt.Permissions] `db:"permissions"`
 	Name         string
 	Phone        sql.NullString
 	Address      sql.NullString
@@ -21,6 +25,8 @@ type UsersModel struct {
 func (um UsersModel) Map() user.User {
 	return user.User{
 		Id:           um.Id,
+		Role:         um.Role,
+		Permissions:  *um.Permissions.Value,
 		Name:         um.Name,
 		Phone:        um.Phone.String,
 		Address:      um.Address.String,

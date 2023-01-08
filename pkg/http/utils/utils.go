@@ -11,7 +11,6 @@ import (
 
 func GetBody[T any](r *http.Request) (T, error) {
 	var data T
-
 	rawData, err := io.ReadAll(r.Body)
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
@@ -22,13 +21,10 @@ func GetBody[T any](r *http.Request) (T, error) {
 	if err != nil {
 		return data, err
 	}
-
 	err = json.Unmarshal(rawData, &data)
-
 	if err != nil {
 		return data, err
 	}
-
 	return data, nil
 }
 
@@ -38,7 +34,6 @@ func SendResponse[T any](code int, data T, w http.ResponseWriter) {
 		SendError(http.StatusInternalServerError, err.Error(), w)
 		return
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	_, _ = w.Write(bytes)

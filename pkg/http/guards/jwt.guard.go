@@ -1,28 +1,31 @@
 package guards
 
 import (
-	"fmt"
 	"github.com/hramov/tg-bot-admin/internal/config"
 	appError "github.com/hramov/tg-bot-admin/internal/error"
 	"github.com/hramov/tg-bot-admin/pkg/http/utils"
 	"github.com/hramov/tg-bot-admin/pkg/jwt"
 	"github.com/julienschmidt/httprouter"
+	"github.com/mitchellh/mapstructure"
 	"net/http"
 	"strconv"
 )
 
-func checkRoles(roles []string, id int, params httprouter.Params) error {
-	for _, role := range roles {
-		if role == "equal_id" {
-			idPathRaw := params.ByName("user_id")
-			idPath, err := strconv.Atoi(idPathRaw)
-			if err != nil {
-				return err
-			}
-			if id != idPath {
-				return fmt.Errorf("id not match")
-			}
-		}
+func checkRoles(roles []string, id int, perm jwt.Permissions, params httprouter.Params) error {
+	//for _, role := range roles {
+	//	if role == "equal_id" {
+	//		idPathRaw := params.ByName("user_id")
+	//		idPath, err := strconv.Atoi(idPathRaw)
+	//		if err != nil {
+	//			return err
+	//		}
+	//		if id != idPath {
+	//			return fmt.Errorf("id not match")
+	//		}
+	//	}
+	//}
+	if perm.Admin {
+		return nil
 	}
 	return nil
 }
@@ -50,7 +53,14 @@ func JwtGuard(h httprouter.Handle, roles []string) httprouter.Handle {
 		}
 
 		if id != 0 {
-			err = checkRoles(roles, id, params)
+			userPermRaw := data["permissions"].(map[string]interface{})
+			var userPerm jwt.Permissions
+			err = mapstructure.Decode(userPermRaw, &userPerm)
+			if err != nil {
+				utils.SendError(http.StatusUnauthorized, err.Error(), w)
+				return
+			}
+			err = checkRoles(roles, id, userPerm, params)
 			if err != nil {
 				utils.SendError(http.StatusUnauthorized, err.Error(), w)
 				return

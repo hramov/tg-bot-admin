@@ -9,9 +9,15 @@ import (
 )
 
 type Claims struct {
-	Id    string `json:"jti,omitempty"`
-	Email string `json:"email"`
-	Exp   int64  `json:"exp"`
+	Id          string      `json:"jti,omitempty"`
+	Email       string      `json:"email"`
+	Exp         int64       `json:"exp"`
+	Permissions Permissions `json:"permissions"`
+}
+
+type Permissions struct {
+	Admin bool     `json:"admin"`
+	Scope []string `json:"scope"`
 }
 
 func (c Claims) Valid() error { return nil } // TODO
@@ -32,10 +38,11 @@ func CheckPassword(plain string, hashed string) bool {
 	return true
 }
 
-func CreateToken(id int, accessSecret, refreshSecret string, accessTtl, refreshTtl time.Duration) (string, string, error) {
+func CreateToken(id int, perm Permissions, accessSecret, refreshSecret string, accessTtl, refreshTtl time.Duration) (string, string, error) {
 	atClaims := Claims{}
 	atClaims.Exp = time.Now().Add(accessTtl).Unix()
 	atClaims.Id = strconv.Itoa(id)
+	atClaims.Permissions = perm
 
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	accessToken, err := at.SignedString([]byte(accessSecret))

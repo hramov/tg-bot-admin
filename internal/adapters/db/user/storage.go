@@ -28,15 +28,12 @@ func (us *userStorage) GetBy(ctx context.Context, field string, param any) (*use
 			panic(err)
 		}
 	}(conn)
-
-	sql := fmt.Sprintf("select * from users where %s = $1", field)
+	sql := fmt.Sprintf("select u.*, r.permissions from users u join roles r on u.role = r.id where u.%s = $1", field)
 	var params = []interface{}{param}
-
 	res, err := postgres.ExecOne[user.User, UsersModel](ctx, conn, sql, params)
 	if err != nil {
 		return nil, err
 	}
-
 	return res, nil
 }
 

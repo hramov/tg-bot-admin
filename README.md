@@ -6,6 +6,7 @@
 4) golang-jwt
 5) cleanenv
 6) logrus
+7) mapstructure
 
 ### Структура проекта:
 1) Cmd - точка входа в приложение
