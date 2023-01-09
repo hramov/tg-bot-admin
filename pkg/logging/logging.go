@@ -2,6 +2,7 @@ package logging
 
 import (
 	"fmt"
+	"github.com/hramov/tg-bot-admin/internal/config"
 	"github.com/sirupsen/logrus"
 	"io"
 	"os"
@@ -46,7 +47,25 @@ func (l *Logger) GetLoggerWithField(k string, v interface{}) *Logger {
 	return &Logger{l.WithField(k, v)}
 }
 
-func init() {
+func fileWriter(cfg *config.Config) io.Writer {
+	err := os.MkdirAll(cfg.Logger.LogsDir, 0644)
+	if err != nil {
+		panic(err)
+	}
+
+	allFile, err := os.OpenFile(cfg.Logger.LogsFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0640)
+	if err != nil {
+		panic(err)
+	}
+
+	return allFile
+}
+
+func dbWriter(cfg *config.Config) io.Writer {
+	return nil
+}
+
+func Init(cfg *config.Config) {
 	l := logrus.New()
 	l.SetReportCaller(true)
 	l.Formatter = &logrus.TextFormatter{
@@ -57,16 +76,6 @@ func init() {
 		DisableColors: false,
 		FullTimestamp: true,
 	}
-
-	//err := os.MkdirAll("data/logs", 0644)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	//allFile, err := os.OpenFile("data/logs/all.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0640)
-	//if err != nil {
-	//	panic(err)
-	//}
 
 	l.SetOutput(io.Discard)
 

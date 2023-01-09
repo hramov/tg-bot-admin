@@ -1,9 +1,8 @@
 package config
 
 import (
-	"fmt"
-	"github.com/hramov/tg-bot-admin/pkg/logging"
 	"github.com/ilyakaznacheev/cleanenv"
+	"log"
 	"sync"
 	"time"
 )
@@ -18,6 +17,7 @@ type Config struct {
 	Storage       StorageConfig `yaml:"storage"`
 	Jwt           JwtConfig     `yaml:"jwt"`
 	Mail          MailConfig    `yaml:"mail"`
+	Logger        Logger        `yaml:"logger"`
 }
 
 type ListenConfig struct {
@@ -66,20 +66,23 @@ type StorageConfig struct {
 	ConnMaxLifetime time.Duration `yaml:"conn_max_lifetime"`
 }
 
+type Logger struct {
+	LogsDir  string `yaml:"logs_dir"`
+	LogsFile string `yaml:"logs_file"`
+}
+
 var instance *Config
 var once sync.Once
 
 func GetConfig() *Config {
 	once.Do(func() {
-		logger := logging.GetLogger()
-		logger.Info("read application configuration")
+		log.Println("read application configuration")
 		instance = &Config{}
 		if err := cleanenv.ReadConfig(configPath, instance); err != nil {
 			help, _ := cleanenv.GetDescription(instance, nil)
-			logger.Info(help)
-			logger.Fatal(err)
+			log.Println(help)
+			log.Println(err)
 		}
-		fmt.Println(instance.Cors.AllowedMethods)
 	})
 	return instance
 }

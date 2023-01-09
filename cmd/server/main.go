@@ -44,6 +44,14 @@ func initModules(logger *logging.Logger, router *httprouter.Router, cfg *config.
 	logger.Info("initializing user module")
 	var userComposite composite.Composite = &composite.UserComposite{}
 	userComposite.Register(logger, cfg, pg, router)
+
+	logger.Info("initializing order module")
+	var orderComposite composite.Composite = &composite.OrderComposite{}
+	orderComposite.Register(logger, cfg, pg, router)
+
+	logger.Info("initializing product module")
+	var productComposite composite.Composite = &composite.ProductComposite{}
+	productComposite.Register(logger, cfg, pg, router)
 }
 
 func start(router *httprouter.Router, cfg *config.Config, logger *logging.Logger) {
@@ -93,8 +101,9 @@ func start(router *httprouter.Router, cfg *config.Config, logger *logging.Logger
 }
 
 func main() {
-	logger := logging.GetLogger()
 	cfg := config.GetConfig()
+	logging.Init(cfg)
+	logger := logging.GetLogger()
 	mail.New(cfg.Mail)
 	pg := initPostgres(cfg, logger)
 	router := initRouter(logger)
