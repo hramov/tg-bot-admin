@@ -3,10 +3,10 @@ package main
 import (
 	"fmt"
 	_ "github.com/hramov/tg-bot-admin/docs"
+	"github.com/hramov/tg-bot-admin/internal/adapters/db"
 	db2 "github.com/hramov/tg-bot-admin/internal/adapters/db"
 	"github.com/hramov/tg-bot-admin/internal/composite"
 	"github.com/hramov/tg-bot-admin/internal/config"
-	"github.com/hramov/tg-bot-admin/pkg/db"
 	"github.com/hramov/tg-bot-admin/pkg/logging"
 	"github.com/hramov/tg-bot-admin/pkg/mail"
 	"github.com/julienschmidt/httprouter"
@@ -26,7 +26,7 @@ func initRouter(logger *logging.Logger) *httprouter.Router {
 
 func initPostgres(cfg *config.Config, logger *logging.Logger) db2.Connector {
 	logger.Info("create postgres connection")
-	pg, err := db.DatabaseFactory(db.Postgres, cfg, logger)
+	pg, err := db.DatabaseFactory(db.Postgres, cfg.Storage)
 	if err != nil {
 		logger.Fatal("cannot start postgres: %v", err)
 		os.Exit(1)
@@ -102,7 +102,7 @@ func start(router *httprouter.Router, cfg *config.Config, logger *logging.Logger
 
 func main() {
 	cfg := config.GetConfig()
-	logging.Init(cfg)
+	logging.Init(cfg.Logger)
 	logger := logging.GetLogger()
 	mail.New(cfg.Mail)
 	pg := initPostgres(cfg, logger)

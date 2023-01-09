@@ -2,9 +2,8 @@ package guards
 
 import (
 	"github.com/hramov/tg-bot-admin/internal/config"
-	appError "github.com/hramov/tg-bot-admin/internal/error"
-	"github.com/hramov/tg-bot-admin/pkg/http/utils"
 	"github.com/hramov/tg-bot-admin/pkg/jwt"
+	"github.com/hramov/tg-bot-admin/pkg/utils"
 	"github.com/julienschmidt/httprouter"
 	"github.com/mitchellh/mapstructure"
 	"net/http"
@@ -69,6 +68,6 @@ func JwtGuard(h httprouter.Handle, roles []string) httprouter.Handle {
 			return
 		}
 
-		utils.SendError(appError.CannotGetIdError().Status(), appError.CannotGetIdError().Error(), w)
+		utils.SendError(http.StatusBadRequest, "cannot get user id", w)
 	}
 }

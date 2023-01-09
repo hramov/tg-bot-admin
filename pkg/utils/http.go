@@ -28,6 +28,21 @@ func GetBody[T any](r *http.Request) (T, error) {
 	return data, nil
 }
 
+func GetTokenFromRequest(req *http.Request) (string, error) {
+	auth := req.Header.Get("authorization")
+	if auth != "" {
+		cred := strings.Split(auth, " ")
+		if len(cred) > 1 && cred[0] == "Bearer" {
+			if cred[1] != "" {
+				return cred[1], nil
+			}
+			return "", fmt.Errorf("no token")
+		}
+		return "", fmt.Errorf("wrong auth header format")
+	}
+	return "", fmt.Errorf("wo auth header")
+}
+
 func SendResponse[T any](code int, data T, w http.ResponseWriter) {
 	bytes, err := json.Marshal(data)
 	if err != nil {
@@ -42,19 +57,4 @@ func SendResponse[T any](code int, data T, w http.ResponseWriter) {
 func SendError(code int, err string, w http.ResponseWriter) {
 	w.WriteHeader(code)
 	_, _ = w.Write([]byte(err))
-}
-
-func GetTokenFromRequest(req *http.Request) (string, error) {
-	auth := req.Header.Get("authorization")
-	if auth != "" {
-		cred := strings.Split(auth, " ")
-		if len(cred) > 1 && cred[0] == "Bearer" {
-			if cred[1] != "" {
-				return cred[1], nil
-			}
-			return "", fmt.Errorf("no token")
-		}
-		return "", fmt.Errorf("wrong auth header format")
-	}
-	return "", fmt.Errorf("wo auth header")
 }

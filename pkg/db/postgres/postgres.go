@@ -3,54 +3,39 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"github.com/hramov/tg-bot-admin/internal/config"
-	"github.com/hramov/tg-bot-admin/pkg/logging"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"log"
 )
 
 type Postgres struct {
-	db     *sqlx.DB
-	logger *logging.Logger
+	db *sqlx.DB
 }
 
 var instance *Postgres
 
-func Connect(cfg *config.Config, logger *logging.Logger) (*Postgres, error) {
+func Connect(cfg Config) (*Postgres, error) {
 	if instance != nil {
 		return instance, nil
 	}
 
 	instance = &Postgres{}
-	db, err := sqlx.Open("postgres", fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", cfg.Storage.Username, cfg.Storage.Password, cfg.Storage.Host, cfg.Storage.Port, cfg.Storage.Database, cfg.Storage.SslMode))
+	db, err := sqlx.Open("postgres", fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.Database, cfg.SslMode))
 	if err != nil {
 		return nil, err
 	}
 
-	db.SetMaxOpenConns(cfg.Storage.MaxOpenCons)
-	db.SetMaxIdleConns(cfg.Storage.MaxIdleCons)
-	db.SetConnMaxIdleTime(cfg.Storage.ConnMaxIdleTime)
-	db.SetConnMaxLifetime(cfg.Storage.ConnMaxLifetime)
+	db.SetMaxOpenConns(cfg.MaxOpenCons)
+	db.SetMaxIdleConns(cfg.MaxIdleCons)
+	db.SetConnMaxIdleTime(cfg.ConnMaxIdleTime)
+	db.SetConnMaxLifetime(cfg.ConnMaxLifetime)
 
 	if err != nil {
 		return nil, err
 	}
 
 	instance.db = db
-	instance.logger = logger
 	return instance, nil
-}
-
-func Disconnect() {
-	if instance == nil || instance.db == nil {
-		return
-	}
-	err := instance.db.Close()
-	if err != nil {
-		log.Println(err.Error())
-	}
-	instance = nil
 }
 
 func (p *Postgres) GetConn(ctx context.Context) (*sqlx.Conn, error) {
@@ -67,6 +52,29 @@ func (p *Postgres) GetConn(ctx context.Context) (*sqlx.Conn, error) {
 	return conn, nil
 }
 
+func (p *Postgres) ReturnConn(ctx context.Context, conn *sqlx.Conn) {
+	select {
+	case <-ctx.Done():
+		return
+	default:
+		err := conn.Close()
+		if err != nil {
+			log.Println(err.Error())
+		}
+	}
+}
+
+func Disconnect() {
+	if instance == nil || instance.db == nil {
+		return
+	}
+	err := instance.db.Close()
+	if err != nil {
+		log.Println(err.Error())
+	}
+	instance = nil
+}
+
 func (p *Postgres) getConnection(ctx context.Context) (*sqlx.Conn, error) {
 	select {
 	case <-ctx.Done():
@@ -77,17 +85,5 @@ func (p *Postgres) getConnection(ctx context.Context) (*sqlx.Conn, error) {
 			return nil, fmt.Errorf("cannot get connection from pool: %v", err)
 		}
 		return conn, nil
-	}
-}
-
-func (p *Postgres) ReturnConn(ctx context.Context, conn *sqlx.Conn) {
-	select {
-	case <-ctx.Done():
-		return
-	default:
-		err := conn.Close()
-		if err != nil {
-			p.logger.Error(err.Error())
-		}
 	}
 }

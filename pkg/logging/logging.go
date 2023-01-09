@@ -2,7 +2,6 @@ package logging
 
 import (
 	"fmt"
-	"github.com/hramov/tg-bot-admin/internal/config"
 	"github.com/sirupsen/logrus"
 	"io"
 	"os"
@@ -11,6 +10,11 @@ import (
 )
 
 var e *logrus.Entry
+
+type Config struct {
+	LogsDir  string `yaml:"logs_dir"`
+	LogsFile string `yaml:"logs_file"`
+}
 
 type Logger struct {
 	*logrus.Entry
@@ -47,13 +51,13 @@ func (l *Logger) GetLoggerWithField(k string, v interface{}) *Logger {
 	return &Logger{l.WithField(k, v)}
 }
 
-func fileWriter(cfg *config.Config) io.Writer {
-	err := os.MkdirAll(cfg.Logger.LogsDir, 0644)
+func fileWriter(cfg *Config) io.Writer {
+	err := os.MkdirAll(cfg.LogsDir, 0644)
 	if err != nil {
 		panic(err)
 	}
 
-	allFile, err := os.OpenFile(cfg.Logger.LogsFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0640)
+	allFile, err := os.OpenFile(cfg.LogsFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0640)
 	if err != nil {
 		panic(err)
 	}
@@ -61,11 +65,11 @@ func fileWriter(cfg *config.Config) io.Writer {
 	return allFile
 }
 
-func dbWriter(cfg *config.Config) io.Writer {
+func dbWriter(cfg *Config) io.Writer {
 	return nil
 }
 
-func Init(cfg *config.Config) {
+func Init(cfg Config) {
 	l := logrus.New()
 	l.SetReportCaller(true)
 	l.Formatter = &logrus.TextFormatter{

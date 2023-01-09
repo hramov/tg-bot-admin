@@ -2,9 +2,9 @@ package composite
 
 import (
 	"github.com/go-playground/validator/v10"
-	"github.com/hramov/tg-bot-admin/internal/adapters/api/order"
-	product2 "github.com/hramov/tg-bot-admin/internal/adapters/api/product"
-	"github.com/hramov/tg-bot-admin/internal/adapters/api/user"
+	"github.com/hramov/tg-bot-admin/internal/adapters/api/handlers/order"
+	product2 "github.com/hramov/tg-bot-admin/internal/adapters/api/handlers/product"
+	"github.com/hramov/tg-bot-admin/internal/adapters/api/handlers/user"
 	"github.com/hramov/tg-bot-admin/internal/adapters/db"
 	order3 "github.com/hramov/tg-bot-admin/internal/adapters/db/order"
 	product3 "github.com/hramov/tg-bot-admin/internal/adapters/db/product"

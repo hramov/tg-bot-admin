@@ -1,6 +1,10 @@
 package config
 
 import (
+	"github.com/hramov/tg-bot-admin/pkg/db/postgres"
+	"github.com/hramov/tg-bot-admin/pkg/jwt"
+	"github.com/hramov/tg-bot-admin/pkg/logging"
+	"github.com/hramov/tg-bot-admin/pkg/mail"
 	"github.com/ilyakaznacheev/cleanenv"
 	"log"
 	"sync"
@@ -10,14 +14,14 @@ import (
 const configPath = "config.yml"
 
 type Config struct {
-	IsDebug       *bool         `yaml:"is_debug" env-required:"true"`
-	IsDevelopment *bool         `yaml:"is_development" env-required:"true"`
-	Listen        ListenConfig  `yaml:"listen"`
-	Cors          CorsConfig    `yaml:"cors"`
-	Storage       StorageConfig `yaml:"storage"`
-	Jwt           JwtConfig     `yaml:"jwt"`
-	Mail          MailConfig    `yaml:"mail"`
-	Logger        Logger        `yaml:"logger"`
+	IsDebug       *bool           `yaml:"is_debug" env-required:"true"`
+	IsDevelopment *bool           `yaml:"is_development" env-required:"true"`
+	Listen        ListenConfig    `yaml:"listen"`
+	Cors          CorsConfig      `yaml:"cors"`
+	Storage       postgres.Config `yaml:"storage"`
+	Jwt           jwt.Config      `yaml:"jwt"`
+	Mail          mail.Config     `yaml:"mail"`
+	Logger        logging.Config  `yaml:"logger"`
 }
 
 type ListenConfig struct {
@@ -37,38 +41,6 @@ type CorsConfig struct {
 	OptionsPassthrough bool     `yaml:"options_passthrough" env-required:"true"`
 	ExposedHeaders     []string `yaml:"exposed_headers" env-required:"true"`
 	Debug              bool     `yaml:"debug" env-default:"false"`
-}
-
-type JwtConfig struct {
-	AccessTtl     time.Duration `yaml:"access_ttl"`
-	RefreshTtl    time.Duration `yaml:"refresh_ttl"`
-	AccessSecret  string        `yaml:"access_secret"`
-	RefreshSecret string        `yaml:"refresh_secret"`
-}
-
-type MailConfig struct {
-	ServerHostName string `yaml:"server_host_name"`
-	ServerPort     string `yaml:"server_port"`
-	Account        string `yaml:"account"`
-	Password       string `yaml:"password"`
-}
-
-type StorageConfig struct {
-	Host            string        `yaml:"host"`
-	Port            string        `yaml:"port"`
-	Database        string        `yaml:"database"`
-	Username        string        `yaml:"username"`
-	Password        string        `yaml:"password"`
-	SslMode         string        `yaml:"ssl_mode"`
-	MaxOpenCons     int           `yaml:"max_open_cons"`
-	MaxIdleCons     int           `yaml:"max_idle_cons"`
-	ConnMaxIdleTime time.Duration `yaml:"conn_max_idle_time"`
-	ConnMaxLifetime time.Duration `yaml:"conn_max_lifetime"`
-}
-
-type Logger struct {
-	LogsDir  string `yaml:"logs_dir"`
-	LogsFile string `yaml:"logs_file"`
 }
 
 var instance *Config

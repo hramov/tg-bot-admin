@@ -1,4 +1,4 @@
-package utils
+package types
 
 func EqualSlice(a, b []uint8) bool {
 	if len(a) != len(b) {

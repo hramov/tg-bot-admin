@@ -23,17 +23,16 @@ func SendRegisterMail(email string, password string) error {
 package mail
 
 import (
-	"github.com/hramov/tg-bot-admin/internal/config"
 	"net/smtp"
 )
 
 var Instance *Mail
 
 type Mail struct {
-	cfg config.MailConfig
+	cfg Config
 }
 
-func New(cfg config.MailConfig) {
+func New(cfg Config) {
 	if Instance == nil {
 		Instance = &Mail{cfg: cfg}
 	}

@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/hramov/tg-bot-admin/internal/config"
 	"github.com/hramov/tg-bot-admin/internal/domain/user"
-	"github.com/hramov/tg-bot-admin/pkg/http/utils"
+	"github.com/hramov/tg-bot-admin/pkg/utils"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"strconv"

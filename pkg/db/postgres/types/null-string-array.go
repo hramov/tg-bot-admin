@@ -1,7 +1,6 @@
 package types
 
 import (
-	"github.com/hramov/tg-bot-admin/pkg/utils"
 	"github.com/lib/pq"
 )
 
@@ -13,7 +12,7 @@ type NullStringArray struct {
 }
 
 func (n *NullStringArray) Scan(value interface{}) error {
-	if value == nil || utils.EqualSlice(value.([]uint8), NullArray) {
+	if value == nil || EqualSlice(value.([]uint8), NullArray) {
 		n.String, n.Valid = []string{}, false
 		return nil
 	}

@@ -2,7 +2,6 @@ package types
 
 import (
 	"encoding/json"
-	"github.com/hramov/tg-bot-admin/pkg/utils"
 )
 
 var NullObject = []uint8{123, 125}
@@ -13,7 +12,7 @@ type NullSqlObject[T any] struct {
 }
 
 func (n *NullSqlObject[T]) Scan(value interface{}) error {
-	if value == nil || utils.EqualSlice(value.([]uint8), NullObject) {
+	if value == nil || EqualSlice(value.([]uint8), NullObject) {
 		n.Value, n.Valid = nil, false
 		return nil
 	}
