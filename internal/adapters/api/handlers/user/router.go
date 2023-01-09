@@ -3,6 +3,7 @@ package user
 import (
 	"github.com/hramov/tg-bot-admin/internal/adapters/api"
 	"github.com/hramov/tg-bot-admin/internal/adapters/api/guards"
+	"github.com/hramov/tg-bot-admin/internal/adapters/api/middlewares"
 	"github.com/hramov/tg-bot-admin/internal/domain/user"
 	"github.com/hramov/tg-bot-admin/pkg/logging"
 	"github.com/julienschmidt/httprouter"
@@ -30,7 +31,7 @@ func NewHandler(logger *logging.Logger, service user.IService) api.Handler {
 
 func (h *handler) Init(router *httprouter.Router) {
 	router.GET(registerUrl, h.Register)
-	router.GET(usersUrl, guards.JwtGuard(h.Get, []string{"admin"}))
+	router.GET(usersUrl, middlewares.Filter(guards.JwtGuard(h.Get, []string{"admin"})))
 	router.GET(userUrl, guards.JwtGuard(h.GetOne, []string{"admin", "equal_id"}))
 	router.POST(loginUrl, h.Login)
 	router.POST(refreshUrl, h.Refresh)

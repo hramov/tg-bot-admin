@@ -48,7 +48,7 @@ func (us *userStorage) GetByEmail(ctx context.Context, email string) (*user.User
 }
 
 func (us *userStorage) Get(ctx context.Context, limit, offset int) ([]*user.User, error) {
-	sql := `select * from users limit $1 offset $2`
+	sql := `select u.*, r.permissions from users u join roles r on u.role = r.id limit $1 offset $2`
 	var params = []interface{}{limit, offset}
 	res, err := db.Exec[user.User, Model](ctx, us.db, sql, params)
 	if err != nil {

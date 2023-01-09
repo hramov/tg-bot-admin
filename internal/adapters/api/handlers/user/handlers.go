@@ -2,6 +2,8 @@ package user
 
 import (
 	"context"
+	"fmt"
+	"github.com/hramov/tg-bot-admin/internal/adapters/api/filter"
 	"github.com/hramov/tg-bot-admin/internal/config"
 	"github.com/hramov/tg-bot-admin/internal/domain/user"
 	"github.com/hramov/tg-bot-admin/pkg/utils"
@@ -103,6 +105,9 @@ func (h *handler) Register(w http.ResponseWriter, r *http.Request, params httpro
 // @Failure 500
 // @Router /api/users/:limit/:offset [get]
 func (h *handler) Get(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	filters := r.Context().Value(filter.Key)
+
+	fmt.Println(filters)
 	ctx, cancel := context.WithTimeout(r.Context(), config.DefaultTimeout)
 	defer cancel()
 

@@ -17,6 +17,7 @@ func Exec[T any, V Mapper[T]](ctx context.Context, db Connector, sql string, par
 		return nil, err
 	}
 	var dto []*T
+
 	for _, v := range model {
 		d := v.Map()
 		dto = append(dto, &d)
@@ -30,7 +31,6 @@ func ExecOne[T any, V Mapper[T]](ctx context.Context, db Connector, sql string, 
 		return nil, err
 	}
 	defer db.ReturnConn(ctx, conn)
-
 	var model []V
 	err = conn.SelectContext(ctx, &model, sql, params...)
 	if err != nil {

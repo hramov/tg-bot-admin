@@ -26,7 +26,7 @@ func (um Model) Map() user.User {
 	return user.User{
 		Id:           um.Id,
 		Role:         um.Role,
-		Permissions:  *um.Permissions.Value,
+		Permissions:  um.Permissions.Value,
 		Name:         um.Name,
 		Phone:        um.Phone.String,
 		Address:      um.Address.String,
