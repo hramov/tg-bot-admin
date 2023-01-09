@@ -39,7 +39,7 @@ func New(cfg config.MailConfig) {
 	}
 }
 
-func (m *Mail) sendMail(receiver string, subject string, body string) error {
+func (m *Mail) SendMail(receiver string, subject string, body string) error {
 	host := m.cfg.ServerHostName
 	port := m.cfg.ServerPort
 	address := host + ":" + port
