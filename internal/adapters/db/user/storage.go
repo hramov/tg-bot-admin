@@ -27,7 +27,7 @@ func (us *userStorage) GetBy(ctx context.Context, field string, param any) (*use
 
 	sql := fmt.Sprintf("select u.*, r.permissions from users u join roles r on u.role = r.id where u.%s = $1", field)
 	var params = []interface{}{param}
-	res, err := postgres.ExecOne[user.User, UsersModel](ctx, conn, sql, params)
+	res, err := postgres.ExecOne[user.User, Model](ctx, conn, sql, params)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (us *userStorage) GetById(ctx context.Context, id int) (*user.User, error) 
 	sql := `select * from users where id = $1`
 	var params = []interface{}{id}
 
-	res, err := postgres.ExecOne[user.User, UsersModel](ctx, conn, sql, params)
+	res, err := postgres.ExecOne[user.User, Model](ctx, conn, sql, params)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (us *userStorage) GetByEmail(ctx context.Context, email string) (*user.User
 	sql := `select id, email, password from users where email = $1`
 	var params = []interface{}{email}
 
-	res, err := postgres.ExecOne[user.User, UsersModel](ctx, conn, sql, params)
+	res, err := postgres.ExecOne[user.User, Model](ctx, conn, sql, params)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (us *userStorage) Get(ctx context.Context, limit, offset int) ([]*user.User
 	sql := `select * from users limit $1 offset $2`
 	var params = []interface{}{limit, offset}
 
-	res, err := postgres.Exec[user.User, UsersModel](ctx, conn, sql, params)
+	res, err := postgres.Exec[user.User, Model](ctx, conn, sql, params)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (us *userStorage) Create(ctx context.Context, dto *user.CreateDto) (*int, e
 	sql := `insert into users (name, phone, address, geo_label, chat_id, email, password, registered_at) values ($1, $2, $3, $4, $5, $6, $7, now()) returning id`
 	var params = []interface{}{dto.Name, dto.Phone, dto.Address, dto.GeoLabel, dto.ChatId, dto.Email, dto.Password}
 
-	res, err := postgres.ExecOne[user.User, UsersModel](ctx, conn, sql, params)
+	res, err := postgres.ExecOne[user.User, Model](ctx, conn, sql, params)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (us *userStorage) Update(ctx context.Context, dto *user.UpdateDto) (*int, e
 	`
 	var params = []interface{}{dto.Name, dto.Phone, dto.Address, dto.GeoLabel, dto.ChatId, dto.Email, dto.Password, dto.Id}
 
-	res, err := postgres.ExecOne[user.User, UsersModel](ctx, conn, sql, params)
+	res, err := postgres.ExecOne[user.User, Model](ctx, conn, sql, params)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func (us *userStorage) Delete(ctx context.Context, id int) (*int, error) {
 	sql := `delete from users where id = $1 returning id`
 	var params = []interface{}{id}
 
-	res, err := postgres.ExecOne[user.User, UsersModel](ctx, conn, sql, params)
+	res, err := postgres.ExecOne[user.User, Model](ctx, conn, sql, params)
 	if err != nil {
 		return nil, err
 	}
