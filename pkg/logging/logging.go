@@ -10,6 +10,12 @@ import (
 	"runtime"
 )
 
+var e *logrus.Entry
+
+type Logger struct {
+	*logrus.Entry
+}
+
 type writerHook struct {
 	Writer    []io.Writer
 	LogLevels []logrus.Level
@@ -31,12 +37,6 @@ func (hook *writerHook) Fire(entry *logrus.Entry) error {
 
 func (hook *writerHook) Levels() []logrus.Level {
 	return hook.LogLevels
-}
-
-var e *logrus.Entry
-
-type Logger struct {
-	*logrus.Entry
 }
 
 func GetLogger() *Logger {
