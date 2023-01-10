@@ -6,12 +6,18 @@ import (
 	"github.com/hramov/tg-bot-admin/pkg/utils"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
 func Filter(h httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-		queryArray := strings.Split(r.URL.RawQuery, "&")
+		unescape, err := url.QueryUnescape(r.URL.RawQuery)
+		if err != nil {
+			utils.SendError(http.StatusBadRequest, err.Error(), w)
+			return
+		}
+		queryArray := strings.Split(unescape, "&")
 		if len(queryArray) == 0 || queryArray[0] == "" {
 			h(w, r, params)
 			return
@@ -34,7 +40,7 @@ func Filter(h httprouter.Handle) httprouter.Handle {
 					option.Max = va
 				}
 			} else {
-				option.Operator = filter.Like
+				option.Operator = filter.Eq
 				option.Value = value
 			}
 			options = append(options, option)

@@ -13,14 +13,14 @@ type IStorage interface {
 	GetBy(ctx context.Context, field string, param any) (*User, error)
 	GetById(ctx context.Context, id int) (*User, error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
-	Get(ctx context.Context, limit, offset int) ([]*User, error)
+	Get(ctx context.Context) ([]*User, error)
 	Create(ctx context.Context, dto *CreateDto) (*int, error)
 	Update(ctx context.Context, dto *UpdateDto) (*int, error)
 	Delete(ctx context.Context, id int) (*int, error)
 }
 
 type IService interface {
-	GetAll(ctx context.Context, limit, offset int) ([]*User, appError.IAppError)
+	GetAll(ctx context.Context) ([]*User, appError.IAppError)
 	GetById(ctx context.Context, id int) (*User, appError.IAppError)
 	Create(ctx context.Context, dto *CreateDto) (*int, appError.IAppError)
 	Update(ctx context.Context, dto *UpdateDto) (*int, appError.IAppError)
@@ -85,8 +85,8 @@ func (s *Service) Refresh(ctx context.Context, dto *LoginResponseDto) (*LoginRes
 	}, nil
 }
 
-func (s *Service) GetAll(ctx context.Context, limit, offset int) ([]*User, appError.IAppError) {
-	users, err := s.storage.Get(ctx, limit, offset)
+func (s *Service) GetAll(ctx context.Context) ([]*User, appError.IAppError) {
+	users, err := s.storage.Get(ctx)
 	if err != nil {
 		return nil, appError.DatabaseError(err)
 	}
