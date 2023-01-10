@@ -52,7 +52,6 @@ func ValidateFilters[T any](ctx context.Context, model *T) bool {
 		return true
 	}
 	filters := f.(filter.Options)
-
 	var tags []string
 	elem := reflect.TypeOf(model).Elem()
 	n := elem.NumField()
@@ -62,13 +61,11 @@ func ValidateFilters[T any](ctx context.Context, model *T) bool {
 		jTag := strings.Split(tag, ",")[0]
 		tags = append(tags, jTag)
 	}
-
 	for _, v := range filters {
 		if utils.Includes(tags, v.Field) == -1 {
 			return false
 		}
 	}
-
 	return true
 }
 
