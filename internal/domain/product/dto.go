@@ -7,6 +7,7 @@ type OutputProductImage = string
 type PriceForAmount map[string]int
 
 type CoreProduct struct {
+	Id              int                  `json:"id"`
 	Title           string               `json:"title"`
 	SpecialDiscount map[string]any       `json:"special_discount"`
 	Quantity        int                  `json:"quantity"`

@@ -27,26 +27,6 @@ func (us *userStorage) GetBy(ctx context.Context, field string, param any) (*use
 	return res, nil
 }
 
-func (us *userStorage) GetById(ctx context.Context, id int) (*user.User, error) {
-	sql := `select * from users where id = $1`
-	var params = []interface{}{id}
-	res, err := db.ExecOne[user.User, Model](ctx, us.db, sql, params)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
-}
-
-func (us *userStorage) GetByEmail(ctx context.Context, email string) (*user.User, error) {
-	sql := `select id, email, password from users where email = $1`
-	var params = []interface{}{email}
-	res, err := db.ExecOne[user.User, Model](ctx, us.db, sql, params)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
-}
-
 func (us *userStorage) Get(ctx context.Context) ([]*user.User, error) {
 	sql := `select users.*, roles.permissions from users join roles on users.role = roles.id`
 	valid := db.ValidateFilters(ctx, &user.User{})
