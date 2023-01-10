@@ -10,6 +10,7 @@ type IAppError interface {
 type AppError struct {
 	statusCode int
 	message    string
+	code       string
 }
 
 func (a AppError) Error() string {

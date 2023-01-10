@@ -27,9 +27,3 @@ type CorsConfig struct {
 type Handler interface {
 	Init(router *httprouter.Router)
 }
-
-type FilterStruct struct {
-	Field    string
-	Operator string
-	Value    string
-}

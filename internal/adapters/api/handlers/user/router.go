@@ -31,7 +31,7 @@ func NewHandler(logger *logging.Logger, service user.IService) api.Handler {
 
 func (h *handler) Init(router *httprouter.Router) {
 	router.GET(registerUrl, h.Register)
-	router.GET(usersUrl, middlewares.Filter(guards.JwtGuard(h.Get, []string{"admin"})))
+	router.GET(usersUrl, guards.JwtGuard(middlewares.Filter(h.Get), []string{"admin"}))
 	router.GET(userUrl, guards.JwtGuard(h.GetOne, []string{"admin", "equal_id"}))
 	router.POST(loginUrl, h.Login)
 	router.POST(refreshUrl, h.Refresh)
