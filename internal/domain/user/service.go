@@ -88,6 +88,7 @@ func (s *Service) Refresh(ctx context.Context, dto *LoginResponseDto) (*LoginRes
 func (s *Service) GetAll(ctx context.Context) ([]*User, appError.IAppError) {
 	users, err := s.storage.Get(ctx)
 	if err != nil {
+		s.logger.Error(err)
 		return nil, appError.DatabaseError(err)
 	}
 	return users, nil
@@ -96,6 +97,7 @@ func (s *Service) GetAll(ctx context.Context) ([]*User, appError.IAppError) {
 func (s *Service) GetById(ctx context.Context, id int) (*User, appError.IAppError) {
 	user, err := s.storage.GetBy(ctx, "id", id)
 	if err != nil {
+		s.logger.Error(err)
 		return nil, appError.DatabaseError(err)
 	}
 	return user, nil
@@ -112,6 +114,7 @@ func (s *Service) Create(ctx context.Context, dto *CreateDto) (*int, appError.IA
 	}
 	id, err := s.storage.Create(ctx, dto)
 	if err != nil {
+		s.logger.Error(err)
 		return nil, appError.DatabaseError(err)
 	}
 	return id, nil
@@ -132,6 +135,7 @@ func (s *Service) Update(ctx context.Context, dto *UpdateDto) (*int, appError.IA
 	}
 	id, err := s.storage.Update(ctx, dto)
 	if err != nil {
+		s.logger.Error(err)
 		return nil, appError.DatabaseError(err)
 	}
 	return id, nil
@@ -140,6 +144,7 @@ func (s *Service) Update(ctx context.Context, dto *UpdateDto) (*int, appError.IA
 func (s *Service) Delete(ctx context.Context, id int) (*int, appError.IAppError) {
 	deletedId, err := s.storage.Delete(ctx, id)
 	if err != nil {
+		s.logger.Error(err)
 		return nil, appError.DatabaseError(err)
 	}
 	return deletedId, nil

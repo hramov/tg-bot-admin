@@ -49,13 +49,15 @@ func (us *userStorage) GetByEmail(ctx context.Context, email string) (*user.User
 
 func (us *userStorage) Get(ctx context.Context) ([]*user.User, error) {
 	sql := `select users.*, roles.permissions from users join roles on users.role = roles.id`
+	valid := db.ValidateFilters(ctx, &user.User{})
+	if !valid {
+		return nil, fmt.Errorf("filters not valid")
+	}
 	sql, filterParams, err := db.FormatSqlFilters(sql, "users", 1, ctx)
-
 	var params []interface{}
 	for _, v := range filterParams {
 		params = append(params, v)
 	}
-
 	res, err := db.Exec[user.User, Model](ctx, us.db, sql, params)
 	if err != nil {
 		return nil, err

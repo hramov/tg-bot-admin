@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/hramov/tg-bot-admin/internal/adapters/api/filter"
 	"github.com/hramov/tg-bot-admin/pkg/utils"
+	"reflect"
+	"strings"
 )
 
 func Exec[T any, V Mapper[T]](ctx context.Context, db Connector, sql string, params []interface{}) ([]*T, error) {
@@ -42,6 +44,32 @@ func ExecOne[T any, V Mapper[T]](ctx context.Context, db Connector, sql string, 
 	}
 	dto := model[0].Map()
 	return &dto, nil
+}
+
+func ValidateFilters[T any](ctx context.Context, model *T) bool {
+	f := ctx.Value(filter.Key)
+	if f == nil {
+		return true
+	}
+	filters := f.(filter.Options)
+
+	var tags []string
+	elem := reflect.TypeOf(model).Elem()
+	n := elem.NumField()
+	for i := 0; i < n; i++ {
+		field := elem.Field(i)
+		tag := field.Tag.Get("json")
+		jTag := strings.Split(tag, ",")[0]
+		tags = append(tags, jTag)
+	}
+
+	for _, v := range filters {
+		if utils.Includes(tags, v.Field) == -1 {
+			return false
+		}
+	}
+
+	return true
 }
 
 func formatFilterOperator(f filter.Option, tName string, n int) (string, []interface{}, int, error) {
