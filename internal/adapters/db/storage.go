@@ -6,6 +6,7 @@ import (
 	"github.com/hramov/tg-bot-admin/internal/adapters/api/filter"
 	"github.com/hramov/tg-bot-admin/pkg/utils"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
@@ -62,7 +63,7 @@ func ValidateFilters[T any](ctx context.Context, model *T) bool {
 		tags = append(tags, jTag)
 	}
 	for _, v := range filters {
-		if utils.Includes(tags, v.Field) == -1 {
+		if utils.Includes(tags, v.Field) == -1 && v.Field != "limit" && v.Field != "offset" {
 			return false
 		}
 	}
@@ -93,14 +94,28 @@ func formatFilterOperator(f filter.Option, tName string, n int) (string, []inter
 }
 
 func FormatSqlFilters(sql string, tName string, startN int, ctx context.Context) (string, []interface{}, error) {
-	f := ctx.Value(filter.Key)
-	if f == nil {
+	rawFilters := ctx.Value(filter.Key)
+	if rawFilters == nil {
 		return sql, nil, nil
 	}
-	filters := f.(filter.Options)
+	filters := rawFilters.(filter.Options)
 	var params []interface{}
-	filterSql := " where "
+
+	var paginationSql string
+	var filterSql = " where "
+
+	var limitStr string
+	var offsetStr string
+
 	for i, f := range filters {
+		if f.Field == "limit" {
+			limitStr = f.Value
+			continue
+		}
+		if f.Field == "offset" {
+			offsetStr = f.Value
+			continue
+		}
 		s, p, n, err := formatFilterOperator(f, tName, i+startN)
 		startN = n
 		if err != nil {
@@ -112,5 +127,30 @@ func FormatSqlFilters(sql string, tName string, startN int, ctx context.Context)
 		}
 	}
 	filterSql = utils.CutStrSuffix(filterSql, 4)
-	return sql + filterSql, params, nil
+
+	if limitStr != "" {
+		limit, err := strconv.Atoi(limitStr)
+		if err != nil {
+			return "", nil, err
+		}
+		paginationSql = fmt.Sprintf("limit $%d ", startN+1)
+		params = append(params, limit)
+	}
+
+	if limitStr != "" && offsetStr != "" {
+		_, err := strconv.Atoi(limitStr)
+		if err != nil {
+			return "", nil, err
+		}
+
+		offset, err := strconv.Atoi(limitStr)
+		if err != nil {
+			return "", nil, err
+		}
+
+		paginationSql += fmt.Sprintf("offset $%d", startN+2)
+		params = append(params, offset)
+	}
+
+	return sql + filterSql + paginationSql, params, nil
 }
