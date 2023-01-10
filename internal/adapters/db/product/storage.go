@@ -29,15 +29,7 @@ func (p *productStorage) GetBy(ctx context.Context, field string, param any) (*p
 
 func (p *productStorage) Get(ctx context.Context) ([]*product.Product, error) {
 	sql := `select products.* from products`
-	valid := db.ValidateFilters(ctx, &product.Product{})
-	if !valid {
-		return nil, fmt.Errorf("filters not valid")
-	}
-	sql, filterParams, err := db.FormatSqlFilters(sql, "products", 1, ctx)
 	var params []interface{}
-	for _, v := range filterParams {
-		params = append(params, v)
-	}
 	res, err := db.Exec[product.Product, Model](ctx, p.db, sql, params)
 	if err != nil {
 		return nil, err

@@ -28,18 +28,15 @@ func (us *userStorage) GetBy(ctx context.Context, field string, param any) (*use
 }
 
 func (us *userStorage) Get(ctx context.Context) ([]*user.User, error) {
+	conn, tx, err := db.BeginTx(ctx, us.db)
 	sql := `select users.*, roles.permissions from users join roles on users.role = roles.id`
-	valid := db.ValidateFilters(ctx, &user.User{})
-	if !valid {
-		return nil, fmt.Errorf("filters not valid")
-	}
-	sql, filterParams, err := db.FormatSqlFilters(sql, "users", 1, ctx)
-	var params []interface{}
-	for _, v := range filterParams {
-		params = append(params, v)
-	}
-	res, err := db.Exec[user.User, Model](ctx, us.db, sql, params)
+	res, err := db.ExecTx[user.User, Model](ctx, tx, sql, nil)
 	if err != nil {
+		return nil, err
+	}
+	err = db.CommitTx(ctx, us.db, conn, tx)
+	if err != nil {
+		us.logger.Error(err.Error())
 		return nil, err
 	}
 	return res, nil
