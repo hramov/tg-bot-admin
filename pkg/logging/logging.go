@@ -9,6 +9,17 @@ import (
 	"runtime"
 )
 
+var e *logrus.Entry
+
+type Config struct {
+	LogsDir  string `yaml:"logs_dir"`
+	LogsFile string `yaml:"logs_file"`
+}
+
+type Logger struct {
+	*logrus.Entry
+}
+
 type writerHook struct {
 	Writer    []io.Writer
 	LogLevels []logrus.Level
@@ -32,12 +43,6 @@ func (hook *writerHook) Levels() []logrus.Level {
 	return hook.LogLevels
 }
 
-var e *logrus.Entry
-
-type Logger struct {
-	*logrus.Entry
-}
-
 func GetLogger() *Logger {
 	return &Logger{e}
 }
@@ -46,7 +51,25 @@ func (l *Logger) GetLoggerWithField(k string, v interface{}) *Logger {
 	return &Logger{l.WithField(k, v)}
 }
 
-func init() {
+func fileWriter(cfg *Config) io.Writer {
+	err := os.MkdirAll(cfg.LogsDir, 0644)
+	if err != nil {
+		panic(err)
+	}
+
+	allFile, err := os.OpenFile(cfg.LogsFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0640)
+	if err != nil {
+		panic(err)
+	}
+
+	return allFile
+}
+
+func dbWriter(cfg *Config) io.Writer {
+	return nil
+}
+
+func Init(cfg Config) {
 	l := logrus.New()
 	l.SetReportCaller(true)
 	l.Formatter = &logrus.TextFormatter{
@@ -58,20 +81,10 @@ func init() {
 		FullTimestamp: true,
 	}
 
-	err := os.MkdirAll("data/logs", 0644)
-	if err != nil {
-		panic(err)
-	}
-
-	allFile, err := os.OpenFile("data/logs/all.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0640)
-	if err != nil {
-		panic(err)
-	}
-
 	l.SetOutput(io.Discard)
 
 	l.AddHook(&writerHook{
-		Writer:    []io.Writer{allFile, os.Stdout},
+		Writer:    []io.Writer{os.Stdout},
 		LogLevels: logrus.AllLevels,
 	})
 

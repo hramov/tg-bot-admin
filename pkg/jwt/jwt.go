@@ -16,8 +16,8 @@ type Claims struct {
 }
 
 type Permissions struct {
-	Admin bool     `json:"admin"`
-	Scope []string `json:"scope"`
+	Admin bool     `json:"admin,omitempty"`
+	Scope []string `json:"scope,omitempty"`
 }
 
 func (c Claims) Valid() error { return nil } // TODO
