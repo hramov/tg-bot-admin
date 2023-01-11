@@ -11,6 +11,10 @@ type repository struct {
 	cache *freecache.Cache
 }
 
+func NewFreeCache(size int) cache.Repository {
+	return &repository{cache: freecache.NewCache(size)}
+}
+
 func (r *repository) EntryCount() int64 {
 	r.Lock()
 	defer r.Unlock()
@@ -30,10 +34,6 @@ func (r *repository) MissCount() int64 {
 	defer r.Unlock()
 
 	return r.cache.MissCount()
-}
-
-func NewCacheRepo(size int) cache.Repository {
-	return &repository{cache: freecache.NewCache(size)}
 }
 
 func (r *repository) GetIterator() cache.Iterator {
