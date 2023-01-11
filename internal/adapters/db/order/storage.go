@@ -6,11 +6,11 @@ import (
 	"github.com/hramov/tg-bot-admin/pkg/logging"
 )
 
-type orderStorage struct {
+type storage struct {
 	db     db.Connector
 	logger *logging.Logger
 }
 
-func NewStorage(logger *logging.Logger, db db.Connector) order.IStorage {
-	return &orderStorage{db: db, logger: logger}
+func NewStorage(logger *logging.Logger, db db.Connector) order.Storage {
+	return &storage{db: db, logger: logger}
 }

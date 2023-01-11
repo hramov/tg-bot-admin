@@ -8,16 +8,16 @@ import (
 	"github.com/hramov/tg-bot-admin/pkg/logging"
 )
 
-type productStorage struct {
+type storage struct {
 	db     db.Connector
 	logger *logging.Logger
 }
 
-func NewStorage(logger *logging.Logger, db db.Connector) product.IStorage {
-	return &productStorage{db: db, logger: logger}
+func NewStorage(logger *logging.Logger, db db.Connector) product.Storage {
+	return &storage{db: db, logger: logger}
 }
 
-func (p *productStorage) GetBy(ctx context.Context, field string, param any) (*product.Product, error) {
+func (p *storage) GetBy(ctx context.Context, field string, param any) (*product.Product, error) {
 	sql := fmt.Sprintf("select * from products where %s = $1", field)
 	var params = []interface{}{param}
 	res, err := db.ExecOne[product.Product, Model](ctx, p.db, sql, params)
@@ -27,7 +27,7 @@ func (p *productStorage) GetBy(ctx context.Context, field string, param any) (*p
 	return res, nil
 }
 
-func (p *productStorage) Get(ctx context.Context) ([]*product.Product, error) {
+func (p *storage) Get(ctx context.Context) ([]*product.Product, error) {
 	sql := `select products.* from products`
 	var params []interface{}
 	res, err := db.Exec[product.Product, Model](ctx, p.db, sql, params)
@@ -37,7 +37,7 @@ func (p *productStorage) Get(ctx context.Context) ([]*product.Product, error) {
 	return res, nil
 }
 
-func (p *productStorage) Create(ctx context.Context, dto product.InputWeedProduct) (*int, error) {
+func (p *storage) Create(ctx context.Context, dto product.InputWeedProduct) (*int, error) {
 	sql := `
 		insert into products 
 			(title, description, quantity, thc, sativa, indica, images, prices_for_gram, special_discount, created_at, updated_at) 
@@ -53,7 +53,7 @@ func (p *productStorage) Create(ctx context.Context, dto product.InputWeedProduc
 	return &res.Id, nil
 }
 
-func (p *productStorage) Update(ctx context.Context, dto product.InputWeedProduct) (*int, error) {
+func (p *storage) Update(ctx context.Context, dto product.InputWeedProduct) (*int, error) {
 	sql := `
 		update users set
 			title = $1,
@@ -77,7 +77,7 @@ func (p *productStorage) Update(ctx context.Context, dto product.InputWeedProduc
 	return &res.Id, nil
 }
 
-func (p *productStorage) Delete(ctx context.Context, id int) (*int, error) {
+func (p *storage) Delete(ctx context.Context, id int) (*int, error) {
 	sql := `delete from products where id = $1 returning id`
 	var params = []interface{}{id}
 	res, err := db.ExecOne[product.Product, Model](ctx, p.db, sql, params)

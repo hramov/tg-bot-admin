@@ -10,7 +10,7 @@ import (
 	"github.com/hramov/tg-bot-admin/pkg/logging"
 )
 
-type IStorage interface {
+type Storage interface {
 	GetBy(ctx context.Context, field string, param any) (*User, error)
 	Get(ctx context.Context) ([]*User, error)
 	Create(ctx context.Context, dto *CreateDto) (*int, error)
@@ -18,7 +18,7 @@ type IStorage interface {
 	Delete(ctx context.Context, id int) (*int, error)
 }
 
-type IService interface {
+type Service interface {
 	GetAll(ctx context.Context) ([]*User, appError.IAppError)
 	GetById(ctx context.Context, id int) (*User, appError.IAppError)
 	Create(ctx context.Context, dto *CreateDto) (*int, appError.IAppError)
@@ -28,18 +28,18 @@ type IService interface {
 	Refresh(ctx context.Context, dto *LoginResponseDto) (*LoginResponseDto, appError.IAppError)
 }
 
-type Service struct {
+type service struct {
 	validator *validator.Validate
-	storage   IStorage
+	storage   Storage
 	logger    *logging.Logger
 	cfg       *config.Config
 }
 
-func NewService(storage IStorage, validator *validator.Validate, logger *logging.Logger, cfg *config.Config) IService {
-	return &Service{storage: storage, validator: validator, logger: logger, cfg: cfg}
+func NewService(storage Storage, validator *validator.Validate, logger *logging.Logger, cfg *config.Config) Service {
+	return &service{storage: storage, validator: validator, logger: logger, cfg: cfg}
 }
 
-func (s *Service) Login(ctx context.Context, dto *LoginDto) (*LoginResponseDto, appError.IAppError) {
+func (s *service) Login(ctx context.Context, dto *LoginDto) (*LoginResponseDto, appError.IAppError) {
 	err := s.validator.Struct(dto)
 	if err != nil {
 		return nil, appError.ValidationError(err)
@@ -62,7 +62,7 @@ func (s *Service) Login(ctx context.Context, dto *LoginDto) (*LoginResponseDto, 
 	}, nil
 }
 
-func (s *Service) Refresh(ctx context.Context, dto *LoginResponseDto) (*LoginResponseDto, appError.IAppError) {
+func (s *service) Refresh(ctx context.Context, dto *LoginResponseDto) (*LoginResponseDto, appError.IAppError) {
 	id, err := jwt.CheckRefreshToken(dto.RefreshToken, s.cfg.Jwt.RefreshSecret)
 	if err != nil {
 		return nil, appError.RefreshTokenIsInvalidError()
@@ -84,7 +84,7 @@ func (s *Service) Refresh(ctx context.Context, dto *LoginResponseDto) (*LoginRes
 	}, nil
 }
 
-func (s *Service) GetAll(ctx context.Context) ([]*User, appError.IAppError) {
+func (s *service) GetAll(ctx context.Context) ([]*User, appError.IAppError) {
 	users, err := s.storage.Get(ctx)
 	if err != nil {
 		s.logger.Error(err)
@@ -93,7 +93,7 @@ func (s *Service) GetAll(ctx context.Context) ([]*User, appError.IAppError) {
 	return users, nil
 }
 
-func (s *Service) GetById(ctx context.Context, id int) (*User, appError.IAppError) {
+func (s *service) GetById(ctx context.Context, id int) (*User, appError.IAppError) {
 	user, err := s.storage.GetBy(ctx, "id", id)
 	if err != nil {
 		s.logger.Error(err)
@@ -102,7 +102,7 @@ func (s *Service) GetById(ctx context.Context, id int) (*User, appError.IAppErro
 	return user, nil
 }
 
-func (s *Service) Create(ctx context.Context, dto *CreateDto) (*int, appError.IAppError) {
+func (s *service) Create(ctx context.Context, dto *CreateDto) (*int, appError.IAppError) {
 	err := s.validator.Struct(dto)
 	if err != nil {
 		return nil, appError.ValidationError(err)
@@ -119,7 +119,7 @@ func (s *Service) Create(ctx context.Context, dto *CreateDto) (*int, appError.IA
 	return id, nil
 }
 
-func (s *Service) Update(ctx context.Context, dto *UpdateDto) (*int, appError.IAppError) {
+func (s *service) Update(ctx context.Context, dto *UpdateDto) (*int, appError.IAppError) {
 	err := s.validator.Struct(dto)
 	if err != nil {
 		return nil, appError.ValidationError(err)
@@ -140,7 +140,7 @@ func (s *Service) Update(ctx context.Context, dto *UpdateDto) (*int, appError.IA
 	return id, nil
 }
 
-func (s *Service) Delete(ctx context.Context, id int) (*int, appError.IAppError) {
+func (s *service) Delete(ctx context.Context, id int) (*int, appError.IAppError) {
 	deletedId, err := s.storage.Delete(ctx, id)
 	if err != nil {
 		s.logger.Error(err)
