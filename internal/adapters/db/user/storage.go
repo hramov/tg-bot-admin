@@ -8,51 +8,51 @@ import (
 	"github.com/hramov/tg-bot-admin/pkg/logging"
 )
 
-type userStorage struct {
+type storage struct {
 	db     db.Connector
 	logger *logging.Logger
 }
 
-func NewStorage(logger *logging.Logger, db db.Connector) user.IStorage {
-	return &userStorage{db: db, logger: logger}
+func NewStorage(logger *logging.Logger, db db.Connector) user.Storage {
+	return &storage{db: db, logger: logger}
 }
 
-func (us *userStorage) GetBy(ctx context.Context, field string, param any) (*user.User, error) {
+func (s *storage) GetBy(ctx context.Context, field string, param any) (*user.User, error) {
 	sql := fmt.Sprintf("select u.*, r.permissions from users u join roles r on u.role = r.id where u.%s = $1", field)
 	var params = []interface{}{param}
-	res, err := db.ExecOne[user.User, Model](ctx, us.db, sql, params)
+	res, err := db.ExecOne[user.User, Model](ctx, s.db, sql, params)
 	if err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 
-func (us *userStorage) Get(ctx context.Context) ([]*user.User, error) {
-	conn, tx, err := db.BeginTx(ctx, us.db)
+func (s *storage) Get(ctx context.Context) ([]*user.User, error) {
+	conn, tx, err := db.BeginTx(ctx, s.db)
 	sql := `select users.*, roles.permissions from users join roles on users.role = roles.id`
 	res, err := db.ExecTx[user.User, Model](ctx, tx, sql, nil)
 	if err != nil {
 		return nil, err
 	}
-	err = db.CommitTx(ctx, us.db, conn, tx)
+	err = db.CommitTx(ctx, s.db, conn, tx)
 	if err != nil {
-		us.logger.Error(err.Error())
+		s.logger.Error(err.Error())
 		return nil, err
 	}
 	return res, nil
 }
 
-func (us *userStorage) Create(ctx context.Context, dto *user.CreateDto) (*int, error) {
+func (s *storage) Create(ctx context.Context, dto *user.CreateDto) (*int, error) {
 	sql := `insert into users (name, phone, address, geo_label, chat_id, email, password, registered_at) values ($1, $2, $3, $4, $5, $6, $7, now()) returning id`
 	var params = []interface{}{dto.Name, dto.Phone, dto.Address, dto.GeoLabel, dto.ChatId, dto.Email, dto.Password}
-	res, err := db.ExecOne[user.User, Model](ctx, us.db, sql, params)
+	res, err := db.ExecOne[user.User, Model](ctx, s.db, sql, params)
 	if err != nil {
 		return nil, err
 	}
 	return &res.Id, nil
 }
 
-func (us *userStorage) Update(ctx context.Context, dto *user.UpdateDto) (*int, error) {
+func (s *storage) Update(ctx context.Context, dto *user.UpdateDto) (*int, error) {
 	sql := `
 		update users set
 			name = $1,
@@ -66,17 +66,17 @@ func (us *userStorage) Update(ctx context.Context, dto *user.UpdateDto) (*int, e
 		returning id
 	`
 	var params = []interface{}{dto.Name, dto.Phone, dto.Address, dto.GeoLabel, dto.ChatId, dto.Email, dto.Password, dto.Id}
-	res, err := db.ExecOne[user.User, Model](ctx, us.db, sql, params)
+	res, err := db.ExecOne[user.User, Model](ctx, s.db, sql, params)
 	if err != nil {
 		return nil, err
 	}
 	return &res.Id, nil
 }
 
-func (us *userStorage) Delete(ctx context.Context, id int) (*int, error) {
+func (s *storage) Delete(ctx context.Context, id int) (*int, error) {
 	sql := `delete from users where id = $1 returning id`
 	var params = []interface{}{id}
-	res, err := db.ExecOne[user.User, Model](ctx, us.db, sql, params)
+	res, err := db.ExecOne[user.User, Model](ctx, s.db, sql, params)
 	if err != nil {
 		return nil, err
 	}

@@ -8,7 +8,7 @@ import (
 	"github.com/hramov/tg-bot-admin/pkg/logging"
 )
 
-type IStorage interface {
+type Storage interface {
 	GetBy(ctx context.Context, field string, param any) (*Product, error)
 	Get(ctx context.Context) ([]*Product, error)
 	Create(ctx context.Context, dto InputWeedProduct) (*int, error)
@@ -16,7 +16,7 @@ type IStorage interface {
 	Delete(ctx context.Context, id int) (*int, error)
 }
 
-type IService interface {
+type Service interface {
 	GetAll(ctx context.Context) ([]*Product, appError.IAppError)
 	GetBy(ctx context.Context, field, value string) (*Product, appError.IAppError)
 	Create(ctx context.Context, dto InputWeedProduct) (*int, appError.IAppError)
@@ -24,18 +24,18 @@ type IService interface {
 	Delete(ctx context.Context, id int) (*int, appError.IAppError)
 }
 
-type Service struct {
+type service struct {
 	validator *validator.Validate
-	storage   IStorage
+	storage   Storage
 	logger    *logging.Logger
 	cfg       *config.Config
 }
 
-func NewService(storage IStorage, validator *validator.Validate, logger *logging.Logger, cfg *config.Config) IService {
-	return &Service{storage: storage, validator: validator, logger: logger, cfg: cfg}
+func NewService(storage Storage, validator *validator.Validate, logger *logging.Logger, cfg *config.Config) Service {
+	return &service{storage: storage, validator: validator, logger: logger, cfg: cfg}
 }
 
-func (s *Service) GetAll(ctx context.Context) ([]*Product, appError.IAppError) {
+func (s *service) GetAll(ctx context.Context) ([]*Product, appError.IAppError) {
 	products, err := s.storage.Get(ctx)
 	if err != nil {
 		s.logger.Error(err)
@@ -44,7 +44,7 @@ func (s *Service) GetAll(ctx context.Context) ([]*Product, appError.IAppError) {
 	return products, nil
 }
 
-func (s *Service) GetBy(ctx context.Context, field, value string) (*Product, appError.IAppError) {
+func (s *service) GetBy(ctx context.Context, field, value string) (*Product, appError.IAppError) {
 	product, err := s.storage.GetBy(ctx, field, value)
 	if err != nil {
 		s.logger.Error(err)
@@ -53,7 +53,7 @@ func (s *Service) GetBy(ctx context.Context, field, value string) (*Product, app
 	return product, nil
 }
 
-func (s *Service) Create(ctx context.Context, dto InputWeedProduct) (*int, appError.IAppError) {
+func (s *service) Create(ctx context.Context, dto InputWeedProduct) (*int, appError.IAppError) {
 	err := s.validator.Struct(dto)
 	if err != nil {
 		return nil, appError.ValidationError(err)
@@ -67,7 +67,7 @@ func (s *Service) Create(ctx context.Context, dto InputWeedProduct) (*int, appEr
 	return id, nil
 }
 
-func (s *Service) Update(ctx context.Context, dto InputWeedProduct) (*int, appError.IAppError) {
+func (s *service) Update(ctx context.Context, dto InputWeedProduct) (*int, appError.IAppError) {
 	err := s.validator.Struct(dto)
 	if err != nil {
 		return nil, appError.ValidationError(err)
@@ -81,7 +81,7 @@ func (s *Service) Update(ctx context.Context, dto InputWeedProduct) (*int, appEr
 	return id, nil
 }
 
-func (s *Service) Delete(ctx context.Context, id int) (*int, appError.IAppError) {
+func (s *service) Delete(ctx context.Context, id int) (*int, appError.IAppError) {
 	deletedId, err := s.storage.Delete(ctx, id)
 	if err != nil {
 		s.logger.Error(err)

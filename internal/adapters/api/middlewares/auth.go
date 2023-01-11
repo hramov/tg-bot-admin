@@ -26,7 +26,7 @@ func Auth(h http.HandlerFunc, roles []string) http.HandlerFunc {
 			return
 		}
 
-		data, err := jwt.TokenValid(token, cfg.Jwt.AccessSecret)
+		data, err := jwt.GetClaims(token, cfg.Jwt.AccessSecret)
 		if err != nil {
 			utils.SendError(http.StatusUnauthorized, err.Error(), w)
 			return

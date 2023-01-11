@@ -8,13 +8,13 @@ import (
 )
 
 type handler struct {
-	service product.IService
+	service product.Service
 	logger  *logging.Logger
 }
 
 const ()
 
-func NewHandler(logger *logging.Logger, service product.IService) api.Handler {
+func NewHandler(logger *logging.Logger, service product.Service) api.Handler {
 	return &handler{
 		service: service,
 		logger:  logger,

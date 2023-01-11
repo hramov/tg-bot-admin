@@ -10,7 +10,7 @@ import (
 )
 
 type handler struct {
-	service user.IService
+	service user.Service
 	logger  *logging.Logger
 }
 
@@ -22,7 +22,7 @@ const (
 	userUrl     = "/api/user/:user_id"
 )
 
-func NewHandler(logger *logging.Logger, service user.IService) api.Handler {
+func NewHandler(logger *logging.Logger, service user.Service) api.Handler {
 	return &handler{
 		service: service,
 		logger:  logger,

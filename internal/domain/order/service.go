@@ -8,10 +8,10 @@ import (
 	"github.com/hramov/tg-bot-admin/pkg/logging"
 )
 
-type IStorage interface {
+type Storage interface {
 }
 
-type IService interface {
+type Service interface {
 	GetAll(ctx context.Context) ([]*Order, appError.IAppError)
 	GetBy(ctx context.Context, field, value string) ([]*Order, appError.IAppError)
 	GetUserOrders(ctx context.Context, userId int) ([]*InfoForUser, appError.IAppError)
@@ -19,38 +19,38 @@ type IService interface {
 	ChangeStatus(ctx context.Context, statusId int) (*int, appError.IAppError)
 }
 
-type Service struct {
+type service struct {
 	validator *validator.Validate
-	storage   IStorage
+	storage   Storage
 	logger    *logging.Logger
 	cfg       *config.Config
 }
 
-func NewService(storage IStorage, validator *validator.Validate, logger *logging.Logger, cfg *config.Config) IService {
-	return &Service{storage: storage, validator: validator, logger: logger, cfg: cfg}
+func NewService(storage Storage, validator *validator.Validate, logger *logging.Logger, cfg *config.Config) Service {
+	return &service{storage: storage, validator: validator, logger: logger, cfg: cfg}
 }
 
-func (s *Service) GetAll(ctx context.Context) ([]*Order, appError.IAppError) {
+func (s *service) GetAll(ctx context.Context) ([]*Order, appError.IAppError) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *Service) GetBy(ctx context.Context, field, value string) ([]*Order, appError.IAppError) {
+func (s *service) GetBy(ctx context.Context, field, value string) ([]*Order, appError.IAppError) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *Service) GetUserOrders(ctx context.Context, userId int) ([]*InfoForUser, appError.IAppError) {
+func (s *service) GetUserOrders(ctx context.Context, userId int) ([]*InfoForUser, appError.IAppError) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *Service) Create(ctx context.Context, dto ShallowWeedProduct) (*int, appError.IAppError) {
+func (s *service) Create(ctx context.Context, dto ShallowWeedProduct) (*int, appError.IAppError) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *Service) ChangeStatus(ctx context.Context, statusId int) (*int, appError.IAppError) {
+func (s *service) ChangeStatus(ctx context.Context, statusId int) (*int, appError.IAppError) {
 	//TODO implement me
 	panic("implement me")
 }
