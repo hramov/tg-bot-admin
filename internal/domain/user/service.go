@@ -5,6 +5,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/hramov/tg-bot-admin/internal/config"
 	appError "github.com/hramov/tg-bot-admin/internal/error"
+	"github.com/hramov/tg-bot-admin/pkg/crypto"
 	"github.com/hramov/tg-bot-admin/pkg/jwt"
 	"github.com/hramov/tg-bot-admin/pkg/logging"
 )
@@ -47,7 +48,7 @@ func (s *Service) Login(ctx context.Context, dto *LoginDto) (*LoginResponseDto, 
 	if err != nil {
 		return nil, appError.DatabaseError(err)
 	}
-	valid := jwt.CheckPassword(dto.Password, user.Password)
+	valid := crypto.CheckPassword(dto.Password, user.Password)
 	if !valid {
 		return nil, appError.LoginOrPasswordIncorrectError()
 	}
@@ -106,7 +107,7 @@ func (s *Service) Create(ctx context.Context, dto *CreateDto) (*int, appError.IA
 	if err != nil {
 		return nil, appError.ValidationError(err)
 	}
-	dto.Password, err = jwt.CreateHashedPassword(dto.Password)
+	dto.Password, err = crypto.CreateHashedPassword(dto.Password)
 	if err != nil {
 		return nil, appError.InternalServerError()
 	}
@@ -125,7 +126,7 @@ func (s *Service) Update(ctx context.Context, dto *UpdateDto) (*int, appError.IA
 	}
 
 	if dto.Password != "" {
-		dto.Password, err = jwt.CreateHashedPassword(dto.Password)
+		dto.Password, err = crypto.CreateHashedPassword(dto.Password)
 	}
 
 	if err != nil {
