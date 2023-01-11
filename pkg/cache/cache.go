@@ -1,5 +1,13 @@
 package cache
 
+import (
+	"github.com/hramov/tg-bot-admin/pkg/cache/freecache"
+)
+
+func New(size int) Repository {
+	return freecache.NewFreeCache(size)
+}
+
 type Repository interface {
 	// GetIterator NewIterator creates a new iterator for the cache.
 	GetIterator() Iterator
