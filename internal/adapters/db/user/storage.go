@@ -27,39 +27,16 @@ func (us *userStorage) GetBy(ctx context.Context, field string, param any) (*use
 	return res, nil
 }
 
-func (us *userStorage) GetById(ctx context.Context, id int) (*user.User, error) {
-	sql := `select * from users where id = $1`
-	var params = []interface{}{id}
-	res, err := db.ExecOne[user.User, Model](ctx, us.db, sql, params)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
-}
-
-func (us *userStorage) GetByEmail(ctx context.Context, email string) (*user.User, error) {
-	sql := `select id, email, password from users where email = $1`
-	var params = []interface{}{email}
-	res, err := db.ExecOne[user.User, Model](ctx, us.db, sql, params)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
-}
-
 func (us *userStorage) Get(ctx context.Context) ([]*user.User, error) {
+	conn, tx, err := db.BeginTx(ctx, us.db)
 	sql := `select users.*, roles.permissions from users join roles on users.role = roles.id`
-	valid := db.ValidateFilters(ctx, &user.User{})
-	if !valid {
-		return nil, fmt.Errorf("filters not valid")
-	}
-	sql, filterParams, err := db.FormatSqlFilters(sql, "users", 1, ctx)
-	var params []interface{}
-	for _, v := range filterParams {
-		params = append(params, v)
-	}
-	res, err := db.Exec[user.User, Model](ctx, us.db, sql, params)
+	res, err := db.ExecTx[user.User, Model](ctx, tx, sql, nil)
 	if err != nil {
+		return nil, err
+	}
+	err = db.CommitTx(ctx, us.db, conn, tx)
+	if err != nil {
+		us.logger.Error(err.Error())
 		return nil, err
 	}
 	return res, nil

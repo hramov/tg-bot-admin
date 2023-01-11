@@ -55,6 +55,7 @@ func SendResponse[T any](code int, data T, w http.ResponseWriter) {
 }
 
 func SendError(code int, err string, w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	_, _ = w.Write([]byte(err))
+	_, _ = w.Write([]byte("{\"error\": \"" + err + "\"}"))
 }

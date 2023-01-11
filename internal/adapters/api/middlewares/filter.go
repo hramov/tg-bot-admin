@@ -4,14 +4,13 @@ import (
 	"context"
 	"github.com/hramov/tg-bot-admin/internal/adapters/api/filter"
 	"github.com/hramov/tg-bot-admin/pkg/utils"
-	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"net/url"
 	"strings"
 )
 
-func Filter(h httprouter.Handle) httprouter.Handle {
-	return func(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func Filter(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 		unescape, err := url.QueryUnescape(r.URL.RawQuery)
 		if err != nil {
 			utils.SendError(http.StatusBadRequest, err.Error(), w)
@@ -19,7 +18,7 @@ func Filter(h httprouter.Handle) httprouter.Handle {
 		}
 		queryArray := strings.Split(unescape, "&")
 		if len(queryArray) == 0 || queryArray[0] == "" {
-			h(w, r, params)
+			h(w, r)
 			return
 		}
 		var options filter.Options
@@ -47,6 +46,6 @@ func Filter(h httprouter.Handle) httprouter.Handle {
 		}
 		ctx := context.WithValue(r.Context(), filter.Key, options)
 		r = r.WithContext(ctx)
-		h(w, r, params)
+		h(w, r)
 	}
 }

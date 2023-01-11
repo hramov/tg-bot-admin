@@ -1,37 +1,25 @@
-package guards
+package middlewares
 
 import (
+	"context"
 	"github.com/hramov/tg-bot-admin/internal/config"
 	"github.com/hramov/tg-bot-admin/pkg/jwt"
 	"github.com/hramov/tg-bot-admin/pkg/utils"
-	"github.com/julienschmidt/httprouter"
 	"github.com/mitchellh/mapstructure"
 	"net/http"
 	"strconv"
 )
 
-func checkRoles(roles []string, id int, perm jwt.Permissions, params httprouter.Params) error {
-	//for _, role := range roles {
-	//	if role == "equal_id" {
-	//		idPathRaw := params.ByName("user_id")
-	//		idPath, err := strconv.Atoi(idPathRaw)
-	//		if err != nil {
-	//			return err
-	//		}
-	//		if id != idPath {
-	//			return fmt.Errorf("id not match")
-	//		}
-	//	}
-	//}
+func checkRoles(roles []string, id int, perm jwt.Permissions) error {
 	if perm.Admin {
 		return nil
 	}
 	return nil
 }
 
-func JwtGuard(h httprouter.Handle, roles []string) httprouter.Handle {
+func Auth(h http.HandlerFunc, roles []string) http.HandlerFunc {
 	cfg := config.GetConfig()
-	return func(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		token, err := utils.GetTokenFromRequest(r)
 		if err != nil {
 			utils.SendError(http.StatusUnauthorized, "cannot get auth token", w)
@@ -59,12 +47,14 @@ func JwtGuard(h httprouter.Handle, roles []string) httprouter.Handle {
 				utils.SendError(http.StatusUnauthorized, err.Error(), w)
 				return
 			}
-			err = checkRoles(roles, id, userPerm, params)
+			err = checkRoles(roles, id, userPerm)
 			if err != nil {
 				utils.SendError(http.StatusUnauthorized, err.Error(), w)
 				return
 			}
-			h(w, r, params)
+
+			ctx := context.WithValue(r.Context(), "user_id", id)
+			h(w, r.WithContext(ctx))
 			return
 		}
 

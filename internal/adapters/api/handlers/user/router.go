@@ -2,11 +2,11 @@ package user
 
 import (
 	"github.com/hramov/tg-bot-admin/internal/adapters/api"
-	"github.com/hramov/tg-bot-admin/internal/adapters/api/guards"
 	"github.com/hramov/tg-bot-admin/internal/adapters/api/middlewares"
 	"github.com/hramov/tg-bot-admin/internal/domain/user"
 	"github.com/hramov/tg-bot-admin/pkg/logging"
 	"github.com/julienschmidt/httprouter"
+	"net/http"
 )
 
 type handler struct {
@@ -30,11 +30,11 @@ func NewHandler(logger *logging.Logger, service user.IService) api.Handler {
 }
 
 func (h *handler) Init(router *httprouter.Router) {
-	router.GET(registerUrl, h.Register)
-	router.GET(usersUrl, middlewares.Filter(guards.JwtGuard(h.Get, []string{"admin"})))
-	router.GET(userUrl, guards.JwtGuard(h.GetOne, []string{"admin", "equal_id"}))
-	router.POST(loginUrl, h.Login)
-	router.POST(refreshUrl, h.Refresh)
-	router.PUT(userUrl, guards.JwtGuard(h.Update, []string{"admin", "equal_id"}))
-	router.DELETE(userUrl, guards.JwtGuard(h.Delete, []string{"admin", "equal_id"}))
+	router.HandlerFunc(http.MethodPost, registerUrl, h.Register)
+	router.HandlerFunc(http.MethodGet, usersUrl, middlewares.Auth(middlewares.Filter(h.Get), []string{"admin"}))
+	router.HandlerFunc(http.MethodGet, userUrl, middlewares.Auth(h.GetOne, []string{"admin", "equal_id"}))
+	router.HandlerFunc(http.MethodPost, loginUrl, h.Login)
+	router.HandlerFunc(http.MethodPost, refreshUrl, h.Refresh)
+	router.HandlerFunc(http.MethodPut, userUrl, middlewares.Auth(h.Update, []string{"admin", "equal_id"}))
+	router.HandlerFunc(http.MethodDelete, userUrl, middlewares.Auth(h.Delete, []string{"admin", "equal_id"}))
 }

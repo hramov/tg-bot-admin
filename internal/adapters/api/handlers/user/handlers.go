@@ -19,7 +19,7 @@ import (
 // @Success      200  {object}  user.LoginResponseDto
 // @Failure 401
 // @Router /api/login [post]
-func (h *handler) Login(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func (h *handler) Login(w http.ResponseWriter, r *http.Request) {
 	body, err := utils.GetBody[user.LoginDto](r)
 	if err != nil {
 		utils.SendError(http.StatusBadRequest, "cannot parse body", w)
@@ -46,7 +46,7 @@ func (h *handler) Login(w http.ResponseWriter, r *http.Request, params httproute
 // @Success      200  {object}  user.LoginResponseDto
 // @Failure 401
 // @Router /api/refresh [post]
-func (h *handler) Refresh(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func (h *handler) Refresh(w http.ResponseWriter, r *http.Request) {
 	body, err := utils.GetBody[user.LoginResponseDto](r)
 	if err != nil {
 		utils.SendError(http.StatusBadRequest, "cannot parse body", w)
@@ -73,7 +73,7 @@ func (h *handler) Refresh(w http.ResponseWriter, r *http.Request, params httprou
 // @Success      200
 // @Failure 400
 // @Router /api/register [post]
-func (h *handler) Register(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func (h *handler) Register(w http.ResponseWriter, r *http.Request) {
 	body, err := utils.GetBody[user.CreateDto](r)
 	if err != nil {
 		utils.SendError(http.StatusBadRequest, "cannot parse body", w)
@@ -102,7 +102,7 @@ func (h *handler) Register(w http.ResponseWriter, r *http.Request, params httpro
 // @Failure 401
 // @Failure 500
 // @Router /api/users/:limit/:offset [get]
-func (h *handler) Get(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), config.DefaultTimeout)
 	defer cancel()
 
@@ -125,7 +125,8 @@ func (h *handler) Get(w http.ResponseWriter, r *http.Request, params httprouter.
 // @Failure 401
 // @Failure 500
 // @Router /api/user/:id [delete]
-func (h *handler) Delete(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
+	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
 	rawId := params.ByName("user_id")
 	id, err := strconv.Atoi(rawId)
 	if err != nil {
@@ -155,7 +156,7 @@ func (h *handler) Delete(w http.ResponseWriter, r *http.Request, params httprout
 // @Failure 401
 // @Failure 500
 // @Router /api/user/:id [put]
-func (h *handler) Update(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 	body, err := utils.GetBody[user.UpdateDto](r)
 	if err != nil {
 		utils.SendError(http.StatusBadRequest, "cannot parse body", w)
@@ -183,7 +184,8 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request, _ httprouter.Pa
 // @Failure 401
 // @Failure 500
 // @Router /api/user/:id [get]
-func (h *handler) GetOne(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+func (h *handler) GetOne(w http.ResponseWriter, r *http.Request) {
+	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
 	rawId := params.ByName("user_id")
 	id, err := strconv.Atoi(rawId)
 	if err != nil {
