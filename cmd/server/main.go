@@ -5,6 +5,7 @@ import (
 	_ "github.com/hramov/tg-bot-admin/docs"
 	"github.com/hramov/tg-bot-admin/internal/adapters/db"
 	db2 "github.com/hramov/tg-bot-admin/internal/adapters/db"
+	"github.com/hramov/tg-bot-admin/internal/adapters/db/migrations"
 	"github.com/hramov/tg-bot-admin/internal/composite"
 	"github.com/hramov/tg-bot-admin/internal/config"
 	"github.com/hramov/tg-bot-admin/pkg/logging"
@@ -31,6 +32,14 @@ func initPostgres(cfg *config.Config, logger *logging.Logger) db2.Connector {
 		logger.Fatal("cannot start postgres: %v", err)
 		os.Exit(1)
 	}
+
+	logger.Info("init postgres migrations")
+	migrations.Init(pg, logger)
+	err = migrations.Start()
+	if err != nil {
+		logger.Errorf("postgres migrations error: %s", err.Error())
+	}
+
 	return pg
 }
 

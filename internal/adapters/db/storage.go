@@ -124,3 +124,11 @@ func ExecOne[T any, V Mapper[T]](ctx context.Context, db Connector, s string, pa
 	dto := model[0].Map()
 	return &dto, nil
 }
+
+func Unwrap(ctx context.Context, db Connector) (*sqlx.Conn, error) {
+	conn, err := db.GetConn(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
+}

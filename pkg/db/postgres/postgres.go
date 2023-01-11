@@ -52,6 +52,19 @@ func (p *Postgres) GetConn(ctx context.Context) (*sqlx.Conn, error) {
 	return conn, nil
 }
 
+func (p *Postgres) getConnection(ctx context.Context) (*sqlx.Conn, error) {
+	select {
+	case <-ctx.Done():
+		return nil, fmt.Errorf("context is already cancelled")
+	default:
+		conn, err := instance.db.Connx(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("cannot get connection from pool: %v", err)
+		}
+		return conn, nil
+	}
+}
+
 func (p *Postgres) ReturnConn(ctx context.Context, conn *sqlx.Conn) {
 	select {
 	case <-ctx.Done():
@@ -73,17 +86,4 @@ func Disconnect() {
 		log.Println(err.Error())
 	}
 	instance = nil
-}
-
-func (p *Postgres) getConnection(ctx context.Context) (*sqlx.Conn, error) {
-	select {
-	case <-ctx.Done():
-		return nil, fmt.Errorf("context is already cancelled")
-	default:
-		conn, err := instance.db.Connx(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("cannot get connection from pool: %v", err)
-		}
-		return conn, nil
-	}
 }
