@@ -30,11 +30,11 @@ func NewHandler(logger *logging.Logger, service user.Service) api.Handler {
 }
 
 func (h *handler) Init(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodPost, registerUrl, h.Register)
-	router.HandlerFunc(http.MethodGet, usersUrl, middlewares.Auth(middlewares.Filter(h.Get), []string{"admin"}))
-	router.HandlerFunc(http.MethodGet, userUrl, middlewares.Auth(h.GetOne, []string{"admin", "equal_id"}))
-	router.HandlerFunc(http.MethodPost, loginUrl, h.Login)
-	router.HandlerFunc(http.MethodPost, refreshUrl, h.Refresh)
-	router.HandlerFunc(http.MethodPut, userUrl, middlewares.Auth(h.Update, []string{"admin", "equal_id"}))
-	router.HandlerFunc(http.MethodDelete, userUrl, middlewares.Auth(h.Delete, []string{"admin", "equal_id"}))
+	router.HandlerFunc(http.MethodPost, registerUrl, middlewares.Timeout(h.Register))
+	router.HandlerFunc(http.MethodGet, usersUrl, middlewares.Timeout(middlewares.Auth(middlewares.Filter(h.Get), []string{"admin"})))
+	router.HandlerFunc(http.MethodGet, userUrl, middlewares.Timeout(middlewares.Auth(h.GetOne, []string{"admin", "equal_id"})))
+	router.HandlerFunc(http.MethodPost, loginUrl, middlewares.Timeout(h.Login))
+	router.HandlerFunc(http.MethodPost, refreshUrl, middlewares.Timeout(h.Refresh))
+	router.HandlerFunc(http.MethodPut, userUrl, middlewares.Timeout(middlewares.Auth(h.Update, []string{"admin", "equal_id"})))
+	router.HandlerFunc(http.MethodDelete, userUrl, middlewares.Timeout(middlewares.Auth(h.Delete, []string{"admin", "equal_id"})))
 }

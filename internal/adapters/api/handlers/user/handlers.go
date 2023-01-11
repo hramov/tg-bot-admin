@@ -1,8 +1,6 @@
 package user
 
 import (
-	"context"
-	"github.com/hramov/tg-bot-admin/internal/config"
 	"github.com/hramov/tg-bot-admin/internal/domain/user"
 	"github.com/hramov/tg-bot-admin/pkg/utils"
 	"github.com/julienschmidt/httprouter"
@@ -26,10 +24,7 @@ func (h *handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), config.DefaultTimeout)
-	defer cancel()
-
-	serviceResponse, serviceError := h.service.Login(ctx, &body)
+	serviceResponse, serviceError := h.service.Login(r.Context(), &body)
 	if serviceError != nil {
 		utils.SendError(serviceError.Status(), serviceError.Error(), w)
 		return
@@ -53,10 +48,7 @@ func (h *handler) Refresh(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), config.DefaultTimeout)
-	defer cancel()
-
-	serviceResponse, serviceError := h.service.Refresh(ctx, &body)
+	serviceResponse, serviceError := h.service.Refresh(r.Context(), &body)
 	if serviceError != nil {
 		utils.SendError(serviceError.Status(), serviceError.Error(), w)
 		return
@@ -80,10 +72,7 @@ func (h *handler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), config.DefaultTimeout)
-	defer cancel()
-
-	serviceResponse, serviceError := h.service.Create(ctx, &body)
+	serviceResponse, serviceError := h.service.Create(r.Context(), &body)
 	if serviceError != nil {
 		utils.SendError(serviceError.Status(), serviceError.Error(), w)
 		return
@@ -103,10 +92,7 @@ func (h *handler) Register(w http.ResponseWriter, r *http.Request) {
 // @Failure 500
 // @Router /api/users/:limit/:offset [get]
 func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), config.DefaultTimeout)
-	defer cancel()
-
-	users, err := h.service.GetAll(ctx)
+	users, err := h.service.GetAll(r.Context())
 	if err != nil {
 		utils.SendError(http.StatusInternalServerError, err.Error(), w)
 		return
@@ -134,10 +120,7 @@ func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), config.DefaultTimeout)
-	defer cancel()
-
-	users, err := h.service.Delete(ctx, id)
+	users, err := h.service.Delete(r.Context(), id)
 	if err != nil {
 		utils.SendError(http.StatusInternalServerError, err.Error(), w)
 		return
@@ -163,10 +146,7 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), config.DefaultTimeout)
-	defer cancel()
-
-	serviceResponse, serviceError := h.service.Update(ctx, &body)
+	serviceResponse, serviceError := h.service.Update(r.Context(), &body)
 	if serviceError != nil {
 		utils.SendError(serviceError.Status(), serviceError.Error(), w)
 		return
@@ -193,10 +173,7 @@ func (h *handler) GetOne(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), config.DefaultTimeout)
-	defer cancel()
-
-	users, err := h.service.GetById(ctx, id)
+	users, err := h.service.GetById(r.Context(), id)
 	if err != nil {
 		utils.SendError(http.StatusInternalServerError, err.Error(), w)
 		return
