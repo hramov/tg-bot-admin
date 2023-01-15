@@ -16,7 +16,7 @@ import (
 // @Success      200  {array}  user.User
 // @Failure 401
 // @Failure 500
-// @Router /api/products?count=&last_id=&sortBy=&desc= [get]
+// @Router /api/products?count=&start=&sortBy=&desc= [get]
 func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 	limit, err := strconv.Atoi(r.URL.Query().Get("count"))
 	if err != nil {
