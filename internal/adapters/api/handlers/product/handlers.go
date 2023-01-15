@@ -11,12 +11,14 @@ import (
 // @Tags Get
 // @Accept       json
 // @Produce      json
-// @Param        limit   path      int  true  "Limit"
-// @Param        offset   path      int  true  "Offset"
+// @Param        count   query      int  true  "Limit"
+// @Param        start   query      int  true  "Offset"
+// @Param        sortBy   query      string  false  "Order By"
+// @Param        desc   query      boolean  false  "true = desc"
 // @Success      200  {array}  user.User
 // @Failure 401
 // @Failure 500
-// @Router /api/products?count=&start=&sortBy=&desc= [get]
+// @Router /api/products [get]
 func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 	limit, err := strconv.Atoi(r.URL.Query().Get("count"))
 	if err != nil {

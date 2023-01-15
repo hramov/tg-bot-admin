@@ -85,12 +85,14 @@ func (h *handler) Register(w http.ResponseWriter, r *http.Request) {
 // @Tags Get
 // @Accept       json
 // @Produce      json
-// @Param        limit   path      int  true  "Limit"
-// @Param        offset   path      int  true  "Offset"
+// @Param        count   query      int  false  "Limit"
+// @Param        start   query      int  false  "Offset"
+// @Param        sortBy   query      string  false  "Order By"
+// @Param        desc   query      boolean  false  "true = desc"
 // @Success      200  {array}  user.User
 // @Failure 401
 // @Failure 500
-// @Router /api/users?count=&start=&sortBy=&desc= [get]
+// @Router /api/users [get]
 func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 	users, err := h.service.GetAll(r.Context())
 	if err != nil {
