@@ -17,20 +17,20 @@ func NewStorage(logger *logging.Logger, db db.Connector) product.Storage {
 	return &storage{db: db, logger: logger}
 }
 
-func (s *storage) GetBy(ctx context.Context, field string, param any) (*product.Product, error) {
-	sql := fmt.Sprintf("select * from products where %s = $1", field)
-	var params = []interface{}{param}
-	res, err := db.ExecOne[product.Product, Model](ctx, s.db, sql, params)
+func (s *storage) Get(ctx context.Context, limit int, lastId int) ([]*product.Product, error) {
+	sql := `select products.* from products where id < $1 order by id desc limit $2`
+	params := []interface{}{lastId, limit}
+	res, err := db.Exec[product.Product, Model](ctx, s.db, sql, params)
 	if err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 
-func (s *storage) Get(ctx context.Context) ([]*product.Product, error) {
-	sql := `select products.* from products`
-	var params []interface{}
-	res, err := db.Exec[product.Product, Model](ctx, s.db, sql, params)
+func (s *storage) GetBy(ctx context.Context, field string, param any) (*product.Product, error) {
+	sql := fmt.Sprintf("select * from products where %s = $1", field)
+	var params = []interface{}{param}
+	res, err := db.ExecOne[product.Product, Model](ctx, s.db, sql, params)
 	if err != nil {
 		return nil, err
 	}

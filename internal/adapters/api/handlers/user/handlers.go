@@ -90,7 +90,7 @@ func (h *handler) Register(w http.ResponseWriter, r *http.Request) {
 // @Success      200  {array}  user.User
 // @Failure 401
 // @Failure 500
-// @Router /api/users/:limit/:offset [get]
+// @Router /api/users?count=&start=&sortBy=&desc= [get]
 func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 	users, err := h.service.GetAll(r.Context())
 	if err != nil {
