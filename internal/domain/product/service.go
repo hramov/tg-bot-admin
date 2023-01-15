@@ -10,14 +10,14 @@ import (
 
 type Storage interface {
 	GetBy(ctx context.Context, field string, param any) (*Product, error)
-	Get(ctx context.Context) ([]*Product, error)
+	Get(ctx context.Context, limit int, lastId int) ([]*Product, error)
 	Create(ctx context.Context, dto InputWeedProduct) (*int, error)
 	Update(ctx context.Context, dto InputWeedProduct) (*int, error)
 	Delete(ctx context.Context, id int) (*int, error)
 }
 
 type Service interface {
-	GetAll(ctx context.Context) ([]*Product, appError.IAppError)
+	GetAll(ctx context.Context, limit int, lastId int) ([]*Product, appError.IAppError)
 	GetBy(ctx context.Context, field, value string) (*Product, appError.IAppError)
 	Create(ctx context.Context, dto InputWeedProduct) (*int, appError.IAppError)
 	Update(ctx context.Context, dto InputWeedProduct) (*int, appError.IAppError)
@@ -35,8 +35,8 @@ func NewService(storage Storage, validator *validator.Validate, logger *logging.
 	return &service{storage: storage, validator: validator, logger: logger, cfg: cfg}
 }
 
-func (s *service) GetAll(ctx context.Context) ([]*Product, appError.IAppError) {
-	products, err := s.storage.Get(ctx)
+func (s *service) GetAll(ctx context.Context, limit, lastId int) ([]*Product, appError.IAppError) {
+	products, err := s.storage.Get(ctx, limit, lastId)
 	if err != nil {
 		s.logger.Error(err)
 		return nil, appError.DatabaseError(err)

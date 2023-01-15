@@ -28,13 +28,8 @@ func (s *storage) GetBy(ctx context.Context, field string, param any) (*user.Use
 }
 
 func (s *storage) Get(ctx context.Context) ([]*user.User, error) {
-	conn, tx, err := db.BeginTx(ctx, s.db)
 	sql := `select users.*, roles.permissions from users join roles on users.role = roles.id`
-	res, err := db.ExecTx[user.User, Model](ctx, tx, sql, nil)
-	if err != nil {
-		return nil, err
-	}
-	err = db.CommitTx(ctx, s.db, conn, tx)
+	res, err := db.Exec[user.User, Model](ctx, s.db, sql, nil)
 	if err != nil {
 		s.logger.Error(err.Error())
 		return nil, err

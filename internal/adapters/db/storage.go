@@ -40,11 +40,12 @@ func RollbackTx(ctx context.Context, db Connector, conn *sqlx.Conn, tx *sqlx.Tx)
 
 // ExecTx TODO think about connection closing
 func ExecTx[T any, V Mapper[T]](ctx context.Context, tx *sqlx.Tx, s string, params []interface{}) ([]*T, error) {
-	valid := validateFilters(ctx, new(T))
+	m := new(T)
+	valid := validateFilters(ctx, m)
 	if !valid {
 		return nil, fmt.Errorf("filters not valid")
 	}
-	s, filterParams, err := formatSqlFilters(s, "users", 1, ctx)
+	s, filterParams, err := formatSqlFilters(ctx, m, s, "users", 1)
 	for _, v := range filterParams {
 		params = append(params, v)
 	}
@@ -80,11 +81,12 @@ func ExecOneTx[T any, V Mapper[T]](ctx context.Context, tx *sqlx.Tx, s string, p
 }
 
 func Exec[T any, V Mapper[T]](ctx context.Context, db Connector, s string, params []interface{}) ([]*T, error) {
-	valid := validateFilters(ctx, new(T))
+	m := new(T)
+	valid := validateFilters(ctx, m)
 	if !valid {
 		return nil, fmt.Errorf("filters not valid")
 	}
-	s, filterParams, err := formatSqlFilters(s, "users", 1, ctx)
+	s, filterParams, err := formatSqlFilters(ctx, m, s, "users", 1)
 	for _, v := range filterParams {
 		params = append(params, v)
 	}
@@ -97,6 +99,7 @@ func Exec[T any, V Mapper[T]](ctx context.Context, db Connector, s string, param
 	var model []V
 	err = conn.SelectContext(ctx, &model, s, params...)
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	var dto []*T

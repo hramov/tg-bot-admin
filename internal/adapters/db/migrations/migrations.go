@@ -26,7 +26,6 @@ func Init(d db.Connector, l *logging.Logger) {
 func Start() error {
 	ctx := context.TODO()
 	conn, err := db.Unwrap(ctx, database)
-
 	for title, migration := range migrations {
 		logger.Infof("start migration: %s", title)
 		sql := migration.up()
