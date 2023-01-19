@@ -1,6 +1,7 @@
 package user
 
 import (
+	"github.com/go-chi/chi/v5"
 	"github.com/hramov/tg-bot-admin/internal/domain/user"
 	"github.com/hramov/tg-bot-admin/pkg/utils"
 	"github.com/julienschmidt/httprouter"
@@ -167,8 +168,7 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 // @Failure 500
 // @Router /api/user/:id [get]
 func (h *handler) GetOne(w http.ResponseWriter, r *http.Request) {
-	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
-	rawId := params.ByName("user_id")
+	rawId := chi.URLParam(r, "user_id")
 	id, err := strconv.Atoi(rawId)
 	if err != nil {
 		utils.SendError(http.StatusBadRequest, "wrong id format", w)

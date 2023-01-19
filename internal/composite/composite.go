@@ -1,6 +1,7 @@
 package composite
 
 import (
+	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 	"github.com/hramov/tg-bot-admin/internal/adapters/api/handlers/order"
 	product2 "github.com/hramov/tg-bot-admin/internal/adapters/api/handlers/product"
@@ -14,12 +15,11 @@ import (
 	"github.com/hramov/tg-bot-admin/internal/domain/product"
 	user3 "github.com/hramov/tg-bot-admin/internal/domain/user"
 	"github.com/hramov/tg-bot-admin/pkg/logging"
-	"github.com/julienschmidt/httprouter"
 )
 
 type UserComposite struct{}
 
-func (uc *UserComposite) Register(logger *logging.Logger, cfg *config.Config, pg db.Connector, router *httprouter.Router) {
+func (uc *UserComposite) Register(logger *logging.Logger, cfg *config.Config, pg db.Connector, router *chi.Mux) {
 	storage := user2.NewStorage(logger, pg)
 	service := user3.NewService(storage, validator.New(), logger, cfg)
 	handler := user.NewHandler(logger, service)
@@ -28,7 +28,7 @@ func (uc *UserComposite) Register(logger *logging.Logger, cfg *config.Config, pg
 
 type ProductComposite struct{}
 
-func (uc *ProductComposite) Register(logger *logging.Logger, cfg *config.Config, pg db.Connector, router *httprouter.Router) {
+func (uc *ProductComposite) Register(logger *logging.Logger, cfg *config.Config, pg db.Connector, router *chi.Mux) {
 	storage := product3.NewStorage(logger, pg)
 	service := product.NewService(storage, validator.New(), logger, cfg)
 	handler := product2.NewHandler(logger, service)
@@ -37,7 +37,7 @@ func (uc *ProductComposite) Register(logger *logging.Logger, cfg *config.Config,
 
 type OrderComposite struct{}
 
-func (uc *OrderComposite) Register(logger *logging.Logger, cfg *config.Config, pg db.Connector, router *httprouter.Router) {
+func (uc *OrderComposite) Register(logger *logging.Logger, cfg *config.Config, pg db.Connector, router *chi.Mux) {
 	storage := order3.NewStorage(logger, pg)
 	service := order2.NewService(storage, validator.New(), logger, cfg)
 	handler := order.NewHandler(logger, service)

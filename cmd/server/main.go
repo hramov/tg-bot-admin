@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	_ "github.com/hramov/tg-bot-admin/docs"
+	"github.com/hramov/tg-bot-admin/internal/adapters/api/middlewares"
 	"github.com/hramov/tg-bot-admin/internal/adapters/db"
 	db2 "github.com/hramov/tg-bot-admin/internal/adapters/db"
 	"github.com/hramov/tg-bot-admin/internal/adapters/db/migrations"
@@ -10,7 +12,6 @@ import (
 	"github.com/hramov/tg-bot-admin/internal/config"
 	"github.com/hramov/tg-bot-admin/pkg/logging"
 	"github.com/hramov/tg-bot-admin/pkg/mail"
-	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"net"
@@ -20,9 +21,14 @@ import (
 	"path/filepath"
 )
 
-func initRouter(logger *logging.Logger) *httprouter.Router {
+func initRouter(logger *logging.Logger) *chi.Mux {
 	logger.Info("create router")
-	return httprouter.New()
+	router := chi.NewRouter()
+
+	router.Use(middlewares.ReqId)
+	router.Use(middlewares.Log)
+
+	return router
 }
 
 func initPostgres(cfg *config.Config, logger *logging.Logger) db2.Connector {
@@ -43,13 +49,13 @@ func initPostgres(cfg *config.Config, logger *logging.Logger) db2.Connector {
 	return pg
 }
 
-func initSwagger(logger *logging.Logger, router *httprouter.Router) {
+func initSwagger(logger *logging.Logger, router *chi.Mux) {
 	logger.Info("swagger docs initializing")
-	router.Handler(http.MethodGet, "/swagger", http.RedirectHandler("/swagger/index.html", http.StatusMovedPermanently))
-	router.Handler(http.MethodGet, "/swagger/*any", httpSwagger.WrapHandler)
+	router.Handle("/swagger", http.RedirectHandler("/swagger/index.html", http.StatusMovedPermanently))
+	router.Get("/swagger/*", httpSwagger.WrapHandler)
 }
 
-func initModules(logger *logging.Logger, router *httprouter.Router, cfg *config.Config, pg db2.Connector) {
+func initModules(logger *logging.Logger, router *chi.Mux, cfg *config.Config, pg db2.Connector) {
 	logger.Info("initializing user module")
 	var userComposite composite.Composite = &composite.UserComposite{}
 	userComposite.Register(logger, cfg, pg, router)
@@ -63,7 +69,7 @@ func initModules(logger *logging.Logger, router *httprouter.Router, cfg *config.
 	productComposite.Register(logger, cfg, pg, router)
 }
 
-func start(router *httprouter.Router, cfg *config.Config, logger *logging.Logger) {
+func start(router *chi.Mux, cfg *config.Config, logger *logging.Logger) {
 	logger.Info("start application")
 	var listener net.Listener
 	var listenErr error

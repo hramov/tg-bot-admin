@@ -7,4 +7,5 @@ const (
 	TcpListener    = "tcp"
 	UnixListener   = "unix"
 	DefaultTimeout = 1 * time.Second
+	RequestId      = "X-Request-ID"
 )

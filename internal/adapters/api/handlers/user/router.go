@@ -1,11 +1,11 @@
 package user
 
 import (
+	"github.com/go-chi/chi/v5"
 	"github.com/hramov/tg-bot-admin/internal/adapters/api"
 	"github.com/hramov/tg-bot-admin/internal/adapters/api/middlewares"
 	"github.com/hramov/tg-bot-admin/internal/domain/user"
 	"github.com/hramov/tg-bot-admin/pkg/logging"
-	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
 
@@ -19,7 +19,7 @@ const (
 	registerUrl = "/api/register"
 	refreshUrl  = "/api/refresh"
 	usersUrl    = "/api/users"
-	userUrl     = "/api/user/:user_id"
+	userUrl     = "/api/user/{user_id}"
 )
 
 func NewHandler(logger *logging.Logger, service user.Service) api.Handler {
@@ -29,12 +29,12 @@ func NewHandler(logger *logging.Logger, service user.Service) api.Handler {
 	}
 }
 
-func (h *handler) Init(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodPost, registerUrl, middlewares.Timeout(h.Register))
-	router.HandlerFunc(http.MethodGet, usersUrl, middlewares.Timeout(middlewares.Auth(middlewares.Filter(h.Get), []string{"admin"})))
-	router.HandlerFunc(http.MethodGet, userUrl, middlewares.Timeout(middlewares.Auth(h.GetOne, []string{"admin", "equal_id"})))
-	router.HandlerFunc(http.MethodPost, loginUrl, middlewares.Timeout(h.Login))
-	router.HandlerFunc(http.MethodPost, refreshUrl, middlewares.Timeout(h.Refresh))
-	router.HandlerFunc(http.MethodPut, userUrl, middlewares.Timeout(middlewares.Auth(h.Update, []string{"admin", "equal_id"})))
-	router.HandlerFunc(http.MethodDelete, userUrl, middlewares.Timeout(middlewares.Auth(h.Delete, []string{"admin", "equal_id"})))
+func (h *handler) Init(router *chi.Mux) {
+	router.MethodFunc(http.MethodPost, registerUrl, middlewares.Timeout(h.Register))
+	router.MethodFunc(http.MethodGet, usersUrl, middlewares.Timeout(middlewares.Auth(middlewares.Filter(h.Get), []string{"admin"})))
+	router.MethodFunc(http.MethodGet, userUrl, middlewares.Timeout(middlewares.Auth(h.GetOne, []string{"admin", "equal_id"})))
+	router.MethodFunc(http.MethodPost, loginUrl, middlewares.Timeout(h.Login))
+	router.MethodFunc(http.MethodPost, refreshUrl, middlewares.Timeout(h.Refresh))
+	router.MethodFunc(http.MethodPut, userUrl, middlewares.Timeout(middlewares.Auth(h.Update, []string{"admin", "equal_id"})))
+	router.MethodFunc(http.MethodDelete, userUrl, middlewares.Timeout(middlewares.Auth(h.Delete, []string{"admin", "equal_id"})))
 }
