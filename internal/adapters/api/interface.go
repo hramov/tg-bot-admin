@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/julienschmidt/httprouter"
+	"github.com/go-chi/chi/v5"
 	"time"
 )
 
@@ -25,5 +25,5 @@ type CorsConfig struct {
 }
 
 type Handler interface {
-	Init(router *httprouter.Router)
+	Init(router *chi.Mux)
 }

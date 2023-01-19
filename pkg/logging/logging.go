@@ -51,6 +51,10 @@ func (l *Logger) GetLoggerWithField(k string, v interface{}) *Logger {
 	return &Logger{l.WithField(k, v)}
 }
 
+func (l *Logger) GetLoggerWithFields(fields logrus.Fields) *Logger {
+	return &Logger{l.WithFields(fields)}
+}
+
 func fileWriter(cfg *Config) io.Writer {
 	err := os.MkdirAll(cfg.LogsDir, 0644)
 	if err != nil {

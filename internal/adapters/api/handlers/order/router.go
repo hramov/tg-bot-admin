@@ -1,10 +1,10 @@
 package order
 
 import (
+	"github.com/go-chi/chi/v5"
 	"github.com/hramov/tg-bot-admin/internal/adapters/api"
 	"github.com/hramov/tg-bot-admin/internal/domain/order"
 	"github.com/hramov/tg-bot-admin/pkg/logging"
-	"github.com/julienschmidt/httprouter"
 )
 
 type handler struct {
@@ -21,5 +21,5 @@ func NewHandler(logger *logging.Logger, service order.Service) api.Handler {
 	}
 }
 
-func (h *handler) Init(router *httprouter.Router) {
+func (h *handler) Init(router *chi.Mux) {
 }
