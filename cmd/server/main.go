@@ -27,6 +27,7 @@ func initRouter(logger *logging.Logger) *chi.Mux {
 
 	router.Use(middlewares.ReqId)
 	router.Use(middlewares.Log)
+	//router.Use(middlewares.Cors)
 
 	return router
 }

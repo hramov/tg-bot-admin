@@ -1,21 +1,20 @@
-package freecache
+package cache
 
 import (
 	"github.com/coocood/freecache"
-	"github.com/hramov/tg-bot-admin/pkg/cache"
 )
 
 type iterator struct {
 	iter *freecache.Iterator
 }
 
-func (i *iterator) Next() *cache.Entry {
+func (i *iterator) Next() *Entry {
 	entry := i.iter.Next()
 	if entry == nil {
 		return nil
 	}
 
-	return &cache.Entry{
+	return &Entry{
 		Key:   entry.Key,
 		Value: entry.Value,
 	}

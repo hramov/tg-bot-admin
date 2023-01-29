@@ -1,11 +1,7 @@
 package cache
 
-import (
-	"github.com/hramov/tg-bot-admin/pkg/cache/freecache"
-)
-
 func New(size int) Repository {
-	return freecache.NewFreeCache(size)
+	return NewFreeCache(size)
 }
 
 type Repository interface {

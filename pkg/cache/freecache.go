@@ -1,9 +1,9 @@
-package freecache
+package cache
 
 import (
-	"github.com/coocood/freecache"
-	"github.com/hramov/tg-bot-admin/pkg/cache"
 	"sync"
+
+	"github.com/coocood/freecache"
 )
 
 type repository struct {
@@ -11,7 +11,7 @@ type repository struct {
 	cache *freecache.Cache
 }
 
-func NewFreeCache(size int) cache.Repository {
+func NewFreeCache(size int) Repository {
 	return &repository{cache: freecache.NewCache(size)}
 }
 
@@ -36,7 +36,7 @@ func (r *repository) MissCount() int64 {
 	return r.cache.MissCount()
 }
 
-func (r *repository) GetIterator() cache.Iterator {
+func (r *repository) GetIterator() Iterator {
 	return &iterator{r.cache.NewIterator()}
 }
 

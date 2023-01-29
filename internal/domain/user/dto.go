@@ -6,13 +6,13 @@ type LoginDto struct {
 }
 
 type CreateDto struct {
-	Name     string `json:"name"`
+	Name     string `json:"name" validate:"required"`
 	Phone    string `json:"phone"`
 	Address  string `json:"address"`
-	Email    string `json:"email"`
+	Email    string `json:"email" validate:"required, email"`
 	GeoLabel string `json:"geo_label"`
 	ChatId   string `json:"chat_id"`
-	Password string `json:"password"`
+	Password string `json:"password" validate:"required"`
 }
 
 type UpdateDto struct {
