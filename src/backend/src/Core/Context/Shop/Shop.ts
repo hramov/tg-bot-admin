@@ -6,7 +6,7 @@ import {Category} from "./Entity/Category";
 import {Payment} from "./ValueObject/Payment";
 import {IShopRepository} from "./IShopRepository";
 
-export type ShopPopulation = {
+export type ShopConstructor = {
     readonly title: string;
     readonly ownerId: Uuid;
     readonly payment: Payment;
@@ -21,7 +21,7 @@ export class Shop extends BaseEntity<Uuid> implements IAggregateRoot {
     private readonly categories: Category[];
     private readonly products: Product[];
 
-    constructor(private readonly repository: IShopRepository, shop?: ShopPopulation) {
+    constructor(private readonly repository: IShopRepository, shop?: ShopConstructor) {
         super()
         if (shop) {
             this.title = shop.title;
@@ -29,6 +29,16 @@ export class Shop extends BaseEntity<Uuid> implements IAggregateRoot {
             this.payment = shop.payment;
             this.categories = shop.categories;
             this.products = shop.products;
+        }
+    }
+
+    mapToObj(): ShopConstructor {
+        return {
+            title: this.title,
+            ownerId: this.ownerId,
+            payment: this.payment,
+            categories: this.categories,
+            products: this.products,
         }
     }
 

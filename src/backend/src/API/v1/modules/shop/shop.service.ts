@@ -1,13 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import {Inject, Injectable} from '@nestjs/common';
 import {Uuid} from "../../../../Shared/src/ValueObject/Objects/Uuid";
 import {ShopDto} from "./dto/shop.dto";
 import {ShopSearchFilter} from "../../common/filters/shop/search.filter";
 import {IShopRepository} from "../../../../Core/Context/Shop/IShopRepository";
+import {SHOP_REPOSITORY} from "../../common/persistent/repository/repository.constants";
 
 @Injectable()
 export class ShopService {
 
-    constructor(private readonly shopRepository: IShopRepository) {}
+    constructor(@Inject(SHOP_REPOSITORY) private readonly shopRepository: IShopRepository) {}
 
 
     get(filters: ShopSearchFilter) {
