@@ -1,8 +1,8 @@
 import {BaseEntity} from "../../../../Shared/src/BaseEntity";
 import {Uuid} from "../../../../Shared/src/ValueObject/Objects/Uuid";
-import {Product} from "./Product";
 import {TelegramId} from "../ValueObject/TelegramId";
 import {Address} from "../ValueObject/Address";
+import {CoreProduct} from './Product';
 
 export enum OrderStatus {
     Requested = 1,
@@ -12,13 +12,19 @@ export enum OrderStatus {
 }
 
 export class Order extends BaseEntity<Uuid> {
-    private readonly shopId: Uuid;
-    private readonly customerId: TelegramId;
-    private readonly deliveryAddress: Address;
+    private readonly shop_id: Uuid;
+    private readonly manager_id: TelegramId;
+    private readonly customer_id: TelegramId;
+    private readonly courier_name: string;
 
-    private readonly products: Product[];
+    private readonly delivery_address: Address;
+    private readonly order_tracking_link: string;
+
+    private readonly products: CoreProduct[];
     private readonly status: OrderStatus;
 
-    private readonly date_ordered: Date;
-    private readonly date_delivered: Date;
+    private readonly order_time: Date;
+    private readonly expected_time: Date;
+    private readonly sending_time: Date;
+    private readonly delivery_time: Date;
 }
