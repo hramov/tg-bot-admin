@@ -2,23 +2,22 @@ import express from "express";
 import {v4} from "uuid";
 import {run} from "../../../bot/bot";
 import {botStore} from "../../../store/bot.store";
+import {sendError, sendResponse} from "../response";
 
 export async function newController(req: express.Request, res: express.Response) {
     const token = req.query.token;
 
     if (!token) {
-        res.statusCode = 400;
-        res.json({
-            status: "Error",
+        sendError(res, 400, {
+            status: false,
             message: 'No token provided'
         });
         return
     }
 
     if (botStore.state.tokens.has(token.toString())) {
-        res.statusCode = 400;
-        res.json({
-            status: "Error",
+        sendError(res, 400, {
+            status: false,
             message: 'The bot is already running',
         });
         return
@@ -29,8 +28,8 @@ export async function newController(req: express.Request, res: express.Response)
     botStore.state.tokens.set(id, token.toString());
 
     botStore.mutations.set(id, bot);
-    res.json({
-        status: "OK",
-        id: id,
+    sendResponse(res, {
+        status: true,
+        message: id,
     });
 }

@@ -1,6 +1,7 @@
 import express from "express";
 import {run} from "../../../bot/bot";
 import {removeBot} from "../../../bot/utils";
+import {sendError, sendResponse} from "../response";
 
 export async function checkController(req: express.Request, res: express.Response) {
     const token = req.query.token;
@@ -19,15 +20,10 @@ export async function checkController(req: express.Request, res: express.Respons
     });
 
     if (checkPromise) {
-        res.statusCode = 200;
-        return res.json({
-            status: "Valid",
-        });
+        return sendResponse(res, { status: true, message: '' })
     }
-
-    res.statusCode = 400;
-    res.json({
-        status: "Not valid",
-        reason: reason,
+    return sendError(res, 400, {
+        status: false,
+        message: reason,
     });
 }

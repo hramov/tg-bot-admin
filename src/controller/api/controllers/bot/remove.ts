@@ -1,19 +1,24 @@
 import express from "express";
 import {botStore} from "../../../store/bot.store";
 import {removeBot} from "../../../bot/utils";
+import {sendError, sendResponse} from "../response";
 
 export async function removeController(req: express.Request, res: express.Response) {
     const id = req.query.id;
     if (!id) {
-        res.statusCode = 400;
-        res.send('Wrong query');
+       sendError(res, 400, {
+            status: false,
+            message: 'Wrong query'
+        });
         return
     }
 
     const bot = botStore.mutations.get(id.toString());
     if (!bot) {
-        res.statusCode = 500;
-        res.send('Cannot get bot');
+        sendError(res, 400, {
+            status: false,
+            message: 'Cannot find bot'
+        });
         return;
     }
 
@@ -21,7 +26,8 @@ export async function removeController(req: express.Request, res: express.Respon
 
     botStore.state.tokens.delete(id.toString());
 
-    res.json({
-        status: "OK",
+    sendResponse(res, {
+        status: true,
+        message: '',
     });
 }
