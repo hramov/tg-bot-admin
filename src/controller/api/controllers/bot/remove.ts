@@ -1,6 +1,6 @@
 import express from "express";
-import {botStore} from "../../store/bot.store";
-import {removeBot} from "../../bot/utils";
+import {botStore} from "../../../store/bot.store";
+import {removeBot} from "../../../bot/utils";
 
 export async function removeController(req: express.Request, res: express.Response) {
     const id = req.query.id;
@@ -17,7 +17,9 @@ export async function removeController(req: express.Request, res: express.Respon
         return;
     }
 
-    await removeBot(bot, id.toString())
+    await removeBot(bot, id.toString());
+
+    botStore.state.tokens.delete(id.toString());
 
     res.json({
         status: "OK",

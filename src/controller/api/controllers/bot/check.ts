@@ -1,6 +1,6 @@
 import express from "express";
-import {run} from "../../bot/bot";
-import {removeBot} from "../../bot/utils";
+import {run} from "../../../bot/bot";
+import {removeBot} from "../../../bot/utils";
 
 export async function checkController(req: express.Request, res: express.Response) {
     const token = req.query.token;
@@ -11,11 +11,11 @@ export async function checkController(req: express.Request, res: express.Respons
 
         bot.on('polling_error', (err) => {
             reason = err.message;
-            removeBot(bot)
-            resolve(false)
+            removeBot(bot);
+            resolve(false);
         });
 
-        setTimeout(() => resolve(true), 2000);
+        setTimeout(() => resolve(true), 10000);
     });
 
     if (checkPromise) {

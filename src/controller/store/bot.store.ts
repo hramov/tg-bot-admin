@@ -3,6 +3,7 @@ import Bot from "node-telegram-bot-api";
 export const botStore = {
     state: {
         bots: new Map<string, Bot>(),
+        tokens: new Map<string, string>(),
     },
     mutations: {
         set: (key: string, value: Bot) => {
