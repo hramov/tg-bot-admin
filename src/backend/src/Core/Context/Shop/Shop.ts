@@ -5,6 +5,8 @@ import {Product} from "./Entity/Product";
 import {Category} from "./Entity/Category";
 import {Payment} from "./ValueObject/Payment";
 import {IShopRepository} from "./IShopRepository";
+import {Fetch} from "../../../Infrastructure/Fetch/Fetch";
+import {FetchError} from "../../../Infrastructure/Fetch/Error";
 
 export type ShopConstructor = {
     readonly title: string;
@@ -32,7 +34,7 @@ export class Shop extends BaseEntity<Uuid> implements IAggregateRoot {
         }
     }
 
-    mapToObj(): ShopConstructor {
+    private mapToObj(): ShopConstructor {
         return {
             title: this.title,
             ownerId: this.ownerId,
@@ -42,8 +44,27 @@ export class Shop extends BaseEntity<Uuid> implements IAggregateRoot {
         }
     }
 
-    create(title: string, ownerId: Uuid): Promise<Uuid> {
-        //validation
+    public async create(ownerId: Uuid, title: string, imgUrl: string): Promise<Uuid> {
         return null;
+    }
+
+    public async linkBot(shopId: Uuid, token: string): Promise<Uuid> {
+        if (await this.checkIsTokenCorrect(token)) {
+            // create bot instance in controller, but not started
+        }
+        return null;
+    }
+
+    public async startBot(botId: Uuid): Promise<Uuid> {
+        // make api call to controller to route /start?id=botId
+        return null;
+    }
+
+    private async checkIsTokenCorrect(token: string): Promise<boolean> {
+        const data = await Fetch.get<{ status: string }>('http://localhost:3002/check?token=' + token);
+        if (data instanceof FetchError) {
+            return false;
+        }
+        return data.status === 'valid';
     }
 }

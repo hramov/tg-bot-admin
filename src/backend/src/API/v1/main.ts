@@ -7,6 +7,8 @@ import {ASYNC_STORAGE} from "./common/constants";
 import {CustomLoggerService} from "./common/logger/custom-logger.service";
 import {Uuid} from "../../Shared/src/ValueObject/Objects/Uuid";
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
+import {ValidationPipe} from "@nestjs/common";
+import {Fetch} from "../../Infrastructure/Fetch/Fetch";
 config({
   path: '.env.local',
 });
@@ -28,7 +30,11 @@ async function bootstrap() {
     });
   });
 
+  app.useGlobalPipes(new ValidationPipe());
+
   app.useLogger(app.get<CustomLoggerService>('CustomLogger'));
+
+  Fetch.init()
 
   const config = new DocumentBuilder()
       .setTitle('TBotAdmin')

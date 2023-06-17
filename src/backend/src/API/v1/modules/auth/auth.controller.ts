@@ -2,7 +2,7 @@ import {
     Body,
     Controller, Post,
 } from '@nestjs/common';
-import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
+import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {AuthService} from "./auth.service";
 import {LoginDto} from "./dto/login.dto";
 import {RegisterDto} from "./dto/register.dto";
@@ -12,7 +12,6 @@ export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
     @ApiTags('Auth')
-    @ApiBearerAuth()
     @Post('/login')
     @ApiOperation({
         summary: 'Login'
@@ -25,7 +24,6 @@ export class AuthController {
     }
 
     @ApiTags('Auth')
-    @ApiBearerAuth()
     @Post('/register')
     @ApiOperation({
         summary: 'Register'
