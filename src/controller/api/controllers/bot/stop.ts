@@ -9,7 +9,7 @@ export async function stopController(req: express.Request, res: express.Response
             status: false,
             message: 'Wrong query'
         });
-        return
+        return;
     }
 
     const bot = botStore.mutations.get(id.toString());

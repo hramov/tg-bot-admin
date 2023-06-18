@@ -1,12 +1,13 @@
 import {
     Body,
-    Controller, Get, Param, Post, Put, Query
+    Controller, Delete, Get, Param, Post, Put, Query
 } from '@nestjs/common';
 import {ShopService} from "./shop.service";
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {Uuid} from "../../../../Shared/src/ValueObject/Objects/Uuid";
 import {ShopDto} from "./dto/shop.dto";
 import {ShopSearchFilter} from "../../common/filters/shop/search.filter";
+import {CreateShopDto} from "./dto/create-shop.dto";
 
 @Controller('shop')
 export class ShopController {
@@ -24,6 +25,19 @@ export class ShopController {
     async get(@Query() query: string) {
         const filters = new ShopSearchFilter(query);
         return this.shopService.get(filters);
+    }
+
+    @ApiTags('Shop')
+    @ApiBearerAuth()
+    @Get('/owner/:owner_id')
+    @ApiOperation({
+        summary: 'Get shop by owner id'
+    })
+    @ApiResponse({
+        status: 200,
+    })
+    async getByOwnerId(@Param('owner_id') ownerId: Uuid) {
+        return this.shopService.getByOwnerId(ownerId);
     }
 
     @ApiTags('Shop')
@@ -48,7 +62,7 @@ export class ShopController {
     @ApiResponse({
         status: 200,
     })
-    async create(@Body() dto: ShopDto) {
+    async create(@Body() dto: CreateShopDto) {
         return this.shopService.create(dto);
     }
 
@@ -67,7 +81,7 @@ export class ShopController {
 
     @ApiTags('Shop')
     @ApiBearerAuth()
-    @Get('/:id')
+    @Delete('/:id')
     @ApiOperation({
         summary: 'Delete shop'
     })

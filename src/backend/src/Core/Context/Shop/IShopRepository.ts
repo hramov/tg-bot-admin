@@ -6,4 +6,5 @@ import {DatabaseError} from "../../Error/Database.error";
 export interface IShopRepository {
     getByFilters(filters: ShopSearchFilter): Promise<Shop[] | DatabaseError>;
     getById(id: Uuid): Promise<Shop | DatabaseError>;
+    getByOwnerId(ownerId: Uuid): Promise<Shop | DatabaseError>;
 }

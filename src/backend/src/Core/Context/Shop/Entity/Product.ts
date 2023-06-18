@@ -8,6 +8,10 @@ export interface CoreProduct {
     quantity: number;
 }
 
+type CustomFields = {
+    [key: string]: string | number
+};
+
 export class Product extends BaseEntity<Uuid> implements CoreProduct {
     private readonly _shop_id: Uuid;
     private readonly _category_id: Uuid;
@@ -18,10 +22,11 @@ export class Product extends BaseEntity<Uuid> implements CoreProduct {
     private readonly _images: string[];
     private readonly _quantity: number;
     private readonly _price: Price;
-    private readonly _customFields: { label: string; value: string | number }[];
+    private readonly _customFields: CustomFields;
 
-    get title() { return this._title; };
-    get price() { return this._price; };
-    get quantity() { return this._quantity; };
-    get product_id() { return this._product_id; };
+    get title() { return this._title; }
+    get price() { return this._price; }
+    get quantity() { return this._quantity; }
+    get product_id() { return this._product_id; }
+
 }

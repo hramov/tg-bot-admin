@@ -1,6 +1,6 @@
 import {
     Body,
-    Controller, Get, Param, Post, Query,
+    Controller, Delete, Get, Param, Post, Query,
 } from '@nestjs/common';
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {OrderService} from "./order.service";
@@ -54,7 +54,7 @@ export class OrderController {
 
     @ApiTags('Order')
     @ApiBearerAuth()
-    @Get('/:id')
+    @Delete('/:id')
     @ApiOperation({
         summary: 'Cancel order'
     })

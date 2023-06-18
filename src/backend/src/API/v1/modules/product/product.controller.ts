@@ -3,7 +3,7 @@ import {
     Controller, Delete, Get, Param, Post, Put, Query,
 } from '@nestjs/common';
 import {ProductService} from "./product.service";
-import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
+import {ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {Uuid} from "../../../../Shared/src/ValueObject/Objects/Uuid";
 import {ProductDto} from "./dto/product.dto";
 import {ProductSearchFilter} from "../../common/filters/product/search.filter";
@@ -20,6 +20,8 @@ export class ProductController {
     })
     @ApiResponse({
         status: 200,
+        type: ProductDto,
+        isArray: true,
     })
     async get(@Query() query: string) {
         const filters = new ProductSearchFilter(query);
@@ -34,6 +36,7 @@ export class ProductController {
     })
     @ApiResponse({
         status: 200,
+        type: ProductDto,
     })
     async getById(@Param('id') productId: Uuid) {
         return this.productService.getById(productId);
@@ -43,7 +46,10 @@ export class ProductController {
     @ApiBearerAuth()
     @Post('/')
     @ApiOperation({
-        summary: 'Create new product'
+        summary: 'Create new product',
+    })
+    @ApiBody({
+        type: ProductDto
     })
     @ApiResponse({
         status: 200,

@@ -1,7 +1,7 @@
 import {BaseEntity} from "../../../Shared/src/BaseEntity";
 import {Uuid} from "../../../Shared/src/ValueObject/Objects/Uuid";
 import {IAggregateRoot} from "../../../Shared/src/IAggregateRoot";
-import {Product} from "./Entity/Product";
+import {CoreProduct, Product} from "./Entity/Product";
 import {Category} from "./Entity/Category";
 import {Payment} from "./ValueObject/Payment";
 import {IShopRepository} from "./IShopRepository";
@@ -15,10 +15,10 @@ export type ShopConstructor = {
     readonly title: string;
     readonly ownerId: Uuid;
     readonly token: string;
-    readonly botId: string;
+    readonly botId: Uuid;
     readonly payment: Payment;
     readonly categories: Category[];
-    readonly products: Product[];
+    readonly products: CoreProduct[];
 }
 
 export class Shop extends BaseEntity<Uuid> implements IAggregateRoot {
@@ -26,9 +26,9 @@ export class Shop extends BaseEntity<Uuid> implements IAggregateRoot {
     private readonly ownerId: Uuid;
     private token: string;
     private botId: Uuid;
-    private payment: Payment;
+    private readonly payment: Payment;
     private readonly categories: Category[];
-    private readonly products: Product[];
+    private readonly products: CoreProduct[];
 
     constructor(private readonly repository: IShopRepository, shop?: ShopConstructor) {
         super()
@@ -36,7 +36,7 @@ export class Shop extends BaseEntity<Uuid> implements IAggregateRoot {
             this.title = shop.title;
             this.ownerId = shop.ownerId;
             this.token = shop.token;
-            this.botId = new Uuid(shop.botId);
+            this.botId = shop.botId;
             this.payment = shop.payment;
             this.categories = shop.categories;
             this.products = shop.products;
@@ -48,7 +48,7 @@ export class Shop extends BaseEntity<Uuid> implements IAggregateRoot {
             title: this.title,
             ownerId: this.ownerId,
             token: this.token,
-            botId: this.botId.toString(),
+            botId: this.botId,
             payment: this.payment,
             categories: this.categories,
             products: this.products,
