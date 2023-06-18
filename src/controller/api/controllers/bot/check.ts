@@ -7,6 +7,8 @@ export async function checkController(req: express.Request, res: express.Respons
     const token = req.query.token;
     let reason = '';
 
+    console.log('Check token ' + token)
+
     const checkPromise = await new Promise((resolve, reject) => {
         const bot = run({token: token});
 

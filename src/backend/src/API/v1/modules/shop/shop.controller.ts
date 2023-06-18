@@ -8,6 +8,9 @@ import {Uuid} from "../../../../Shared/src/ValueObject/Objects/Uuid";
 import {ShopDto} from "./dto/shop.dto";
 import {ShopSearchFilter} from "../../common/filters/shop/search.filter";
 import {CreateShopDto} from "./dto/create-shop.dto";
+import {Public} from "../user/public.decorator";
+import {DatabaseError} from "../../../../Core/Error/Database.error";
+import {checkError} from "../../error/CheckError";
 
 @Controller('shop')
 export class ShopController {
@@ -53,17 +56,22 @@ export class ShopController {
         return this.shopService.getById(shopId);
     }
 
+    @Public()
     @ApiTags('Shop')
     @ApiBearerAuth()
     @Post('/')
     @ApiOperation({
-        summary: 'Create new shop'
+        summary: 'Create new shop',
     })
     @ApiResponse({
-        status: 200,
+        status: 201,
     })
     async create(@Body() dto: CreateShopDto) {
-        return this.shopService.create(dto);
+        const data = await this.shopService.create(dto);
+        if (data instanceof Error) {
+            return checkError(data);
+        }
+        return data;
     }
 
     @ApiTags('Shop')
