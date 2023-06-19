@@ -38,15 +38,20 @@ export class ShopController {
 
     @ApiTags('Shop')
     @ApiBearerAuth()
-    @Get('/owner/:owner_id')
+    @Get('/my')
+    @Roles(Role.Admin, Role.Owner)
     @ApiOperation({
-        summary: 'Get shop by owner id'
+        summary: 'Get user shop'
     })
     @ApiResponse({
         status: 200,
     })
-    async getByOwnerId(@Param('owner_id') ownerId: string) {
-        return this.shopService.getByOwnerId(ownerId);
+    async getByOwnerId(@User() user: UserDto) {
+        const result = await this.shopService.getByOwnerId(user.id);
+        if (result instanceof Error) {
+            checkError(result);
+        }
+        return result;
     }
 
     @ApiTags('Shop')

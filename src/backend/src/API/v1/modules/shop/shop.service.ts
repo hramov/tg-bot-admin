@@ -27,8 +27,8 @@ export class ShopService {
         return this.shopRepository.findOneBy({id: shopId.toString()});
     }
 
-    async getByOwnerId(ownerTgName: string) {
-        return this.shopRepository.findOneBy({owner_tg_name: ownerTgName});
+    async getByOwnerId(ownerId: string) {
+        return this.shopRepository.findOneBy({owner_id: ownerId});
     }
 
     async save(dto: CreateShopDto, user: UserDto): Promise<Uuid | Error> {
