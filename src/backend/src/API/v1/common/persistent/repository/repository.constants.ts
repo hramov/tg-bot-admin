@@ -1,1 +1,0 @@
-export const SHOP_REPOSITORY = Symbol('shopRepository');

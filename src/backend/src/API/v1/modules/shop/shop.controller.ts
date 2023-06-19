@@ -5,9 +5,13 @@ import {
 import {ShopService} from "./shop.service";
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {Uuid} from "../../../../Shared/src/ValueObject/Objects/Uuid";
-import {ShopDto} from "./dto/shop.dto";
 import {ShopSearchFilter} from "../../common/filters/shop/search.filter";
 import {CreateShopDto} from "./dto/create-shop.dto";
+import {checkError} from "../../error/CheckError";
+import {Roles} from "../auth/roles.decorator";
+import {Role} from "../auth/role.enum";
+import {User} from "../auth/user.decorator";
+import {UserDto} from "../user/dto/user.dto";
 
 @Controller('shop')
 export class ShopController {
@@ -15,6 +19,7 @@ export class ShopController {
 
     @ApiTags('Shop')
     @ApiBearerAuth()
+    @Roles(Role.Admin)
     @Get('/')
     @ApiOperation({
         summary: 'Get shop list'
@@ -24,7 +29,11 @@ export class ShopController {
     })
     async get(@Query() query: string) {
         const filters = new ShopSearchFilter(query);
-        return this.shopService.get(filters);
+        const result = await this.shopService.get(filters);
+        if (result instanceof Error) {
+            checkError(result);
+        }
+        return result;
     }
 
     @ApiTags('Shop')
@@ -36,7 +45,7 @@ export class ShopController {
     @ApiResponse({
         status: 200,
     })
-    async getByOwnerId(@Param('owner_id') ownerId: Uuid) {
+    async getByOwnerId(@Param('owner_id') ownerId: string) {
         return this.shopService.getByOwnerId(ownerId);
     }
 
@@ -56,14 +65,25 @@ export class ShopController {
     @ApiTags('Shop')
     @ApiBearerAuth()
     @Post('/')
+    @Roles(Role.Admin, Role.Owner)
     @ApiOperation({
-        summary: 'Create new shop'
+        summary: 'Create new shop',
     })
     @ApiResponse({
-        status: 200,
+        status: 201,
     })
-    async create(@Body() dto: CreateShopDto) {
-        return this.shopService.create(dto);
+    @ApiResponse({
+        status: 400,
+    })
+    @ApiResponse({
+        status: 500,
+    })
+    async create(@Body() dto: CreateShopDto, @User() user: UserDto) {
+        const data = await this.shopService.save(dto, user);
+        if (data instanceof Error) {
+            checkError(data);
+        }
+        return data;
     }
 
     @ApiTags('Shop')
@@ -75,8 +95,12 @@ export class ShopController {
     @ApiResponse({
         status: 200,
     })
-    async update(@Body() dto: ShopDto, @Param('id') shopId: Uuid) {
-        return this.shopService.update(dto, shopId);
+    async update(@Body() dto: CreateShopDto, @User() user: UserDto) {
+        const data = await this.shopService.save(dto, user);
+        if (data instanceof Error) {
+            checkError(data);
+        }
+        return data;
     }
 
     @ApiTags('Shop')

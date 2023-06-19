@@ -7,6 +7,8 @@ export async function checkController(req: express.Request, res: express.Respons
     const token = req.query.token;
     let reason = '';
 
+    console.log('Check token ' + token)
+
     const checkPromise = await new Promise((resolve, reject) => {
         const bot = run({token: token});
 
@@ -20,10 +22,10 @@ export async function checkController(req: express.Request, res: express.Respons
     });
 
     if (checkPromise) {
+        console.log('Token ' + token + ' is valid');
         return sendResponse(res, { status: true, message: '' })
     }
-    return sendError(res, 400, {
-        status: false,
-        message: reason,
-    });
+
+    console.log('Token ' + token + ' is not valid: ' + reason);
+    return sendResponse(res, { status: false, message: reason })
 }

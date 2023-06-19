@@ -19,15 +19,16 @@ export class Fetch {
 
         Fetch.instance = axios.create({
             baseURL: 'http://localhost',
-            timeout: 10000,
+            timeout: 15000,
         });
     }
 
     static async get<T>(url: string): Promise<T | FetchError> {
-        const response = await this.instance.get(url);
-        if (response.status === 200) {
+        try {
+            const response = await this.instance.get(url);
             return response.data;
+        } catch(err) {
+            return new FetchError(url, err.message);
         }
-        return new FetchError(url, response.data.error);
     }
 }
