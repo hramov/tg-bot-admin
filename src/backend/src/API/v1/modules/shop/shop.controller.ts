@@ -5,11 +5,9 @@ import {
 import {ShopService} from "./shop.service";
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {Uuid} from "../../../../Shared/src/ValueObject/Objects/Uuid";
-import {ShopDto} from "./dto/shop.dto";
 import {ShopSearchFilter} from "../../common/filters/shop/search.filter";
 import {CreateShopDto} from "./dto/create-shop.dto";
 import {Public} from "../user/public.decorator";
-import {DatabaseError} from "../../../../Core/Error/Database.error";
 import {checkError} from "../../error/CheckError";
 
 @Controller('shop')
@@ -39,7 +37,7 @@ export class ShopController {
     @ApiResponse({
         status: 200,
     })
-    async getByOwnerId(@Param('owner_id') ownerId: Uuid) {
+    async getByOwnerId(@Param('owner_id') ownerId: string) {
         return this.shopService.getByOwnerId(ownerId);
     }
 
@@ -66,10 +64,16 @@ export class ShopController {
     @ApiResponse({
         status: 201,
     })
+    @ApiResponse({
+        status: 400,
+    })
+    @ApiResponse({
+        status: 500,
+    })
     async create(@Body() dto: CreateShopDto) {
-        const data = await this.shopService.create(dto);
+        const data = await this.shopService.save(dto);
         if (data instanceof Error) {
-            return checkError(data);
+            checkError(data);
         }
         return data;
     }
@@ -83,8 +87,12 @@ export class ShopController {
     @ApiResponse({
         status: 200,
     })
-    async update(@Body() dto: ShopDto, @Param('id') shopId: Uuid) {
-        return this.shopService.update(dto, shopId);
+    async update(@Body() dto: CreateShopDto, @Param('id') shopId: Uuid) {
+        const data = await this.shopService.save(dto);
+        if (data instanceof Error) {
+            checkError(data);
+        }
+        return data;
     }
 
     @ApiTags('Shop')

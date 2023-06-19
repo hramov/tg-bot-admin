@@ -1,33 +1,36 @@
-import {Inject, Injectable} from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import {Uuid} from "../../../../Shared/src/ValueObject/Objects/Uuid";
-import {ShopDto} from "./dto/shop.dto";
 import {ShopSearchFilter} from "../../common/filters/shop/search.filter";
-import {IShopRepository} from "../../../../Core/Context/Shop/IShopRepository";
-import {SHOP_REPOSITORY} from "../../common/persistent/repository/repository.constants";
 import {CreateShopDto} from "./dto/create-shop.dto";
 import {Fetch} from "../../../../Infrastructure/Fetch/Fetch";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import {ControllerResponse} from "../../../../../../shared/backendToController";
 import {FetchError} from "../../../../Infrastructure/Fetch/Error";
 import {telegramBotTokenRegexp, telegramUsernameRegexp} from "./shop.constants";
+import {TelegramError} from "../../../../Core/Context/Shop/Error/Telegram.error";
+import {InjectRepository} from "@nestjs/typeorm";
+import {Repository} from "typeorm";
+import { ShopEntity } from "../../common/persistent/entity/shop/shop.entity";
 
 @Injectable()
 export class ShopService {
 
-    constructor(@Inject(SHOP_REPOSITORY) private readonly shopRepository: IShopRepository) {}
+    constructor(@InjectRepository(ShopEntity) private readonly shopRepository: Repository<ShopEntity>) {}
 
-    get(filters: ShopSearchFilter) {
-        return this.shopRepository.getByFilters(filters);
+    async get(filters: ShopSearchFilter) {
+        return this.shopRepository.find();
     }
 
-    getById(shopId: Uuid) {
-        return this.shopRepository.getById(shopId);
+    async getById(shopId: Uuid) {
+        return this.shopRepository.findOneBy({id: shopId.toString()});
     }
 
-    getByOwnerId(shopId: Uuid) {
-        return this.shopRepository.getByOwnerId(shopId);
+    async getByOwnerId(ownerTgName: string) {
+        return this.shopRepository.findOneBy({owner_tg_name: ownerTgName});
     }
 
-    async create(dto: CreateShopDto): Promise<Uuid | Error> {
+    async save(dto: CreateShopDto): Promise<Uuid | Error> {
         if (dto.owner_tg_name.match(telegramUsernameRegexp) === null) {
             return new Error('Wrong telegram username format');
         }
@@ -37,22 +40,26 @@ export class ShopService {
         }
 
         const data = await Fetch.get<ControllerResponse>(process.env.CONTROLLER_URL + '/check?token=' + dto.bot_token);
+
         if (data instanceof FetchError) {
             return new Error('Cannot check token');
         }
 
         if (data.status === false) {
-            return new Error(data.message);
+            return new TelegramError(data.message);
         }
 
-        return this.shopRepository.create(dto);
+        const shop = this.shopRepository.create();
+        shop.owner_tg_name = dto.owner_tg_name;
+        shop.local_shop_name = dto.local_shop_name;
+        shop.bot_token = dto.bot_token;
+
+        const result = await this.shopRepository.save(shop);
+        return new Uuid(result.id);
     }
 
-    update(dto: ShopDto, shopId: Uuid) {
-        return Promise.resolve(undefined);
-    }
-
-    delete(shopId: Uuid) {
-        return Promise.resolve(undefined);
+    async delete(shopId: Uuid) {
+        await this.shopRepository.delete({ id: shopId.toString()});
+        return shopId;
     }
 }
