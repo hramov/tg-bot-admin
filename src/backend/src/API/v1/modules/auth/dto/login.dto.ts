@@ -1,12 +1,9 @@
-import {IsBoolean, IsEmail, IsStrongPassword} from "class-validator";
+import {IsString, IsStrongPassword} from "class-validator";
 
 export class LoginDto {
-    @IsEmail()
-    email: string;
+    @IsString()
+    tg_name: string;
 
     @IsStrongPassword()
     password: string;
-
-    @IsBoolean()
-    remember: boolean;
 }

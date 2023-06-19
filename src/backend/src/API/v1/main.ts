@@ -9,6 +9,8 @@ import {Uuid} from "../../Shared/src/ValueObject/Objects/Uuid";
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
 import {ValidationPipe} from "@nestjs/common";
 import {Fetch} from "../../Infrastructure/Fetch/Fetch";
+import helmet from 'helmet';
+
 config({
   path: '.env.local',
 });
@@ -33,6 +35,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   app.useLogger(app.get<CustomLoggerService>('CustomLogger'));
+
+  app.use(helmet());
 
   Fetch.init()
 

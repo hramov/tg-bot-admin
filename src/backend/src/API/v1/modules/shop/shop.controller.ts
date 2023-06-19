@@ -7,8 +7,11 @@ import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger
 import {Uuid} from "../../../../Shared/src/ValueObject/Objects/Uuid";
 import {ShopSearchFilter} from "../../common/filters/shop/search.filter";
 import {CreateShopDto} from "./dto/create-shop.dto";
-import {Public} from "../user/public.decorator";
 import {checkError} from "../../error/CheckError";
+import {Roles} from "../auth/roles.decorator";
+import {Role} from "../auth/role.enum";
+import {User} from "../auth/user.decorator";
+import {UserDto} from "../user/dto/user.dto";
 
 @Controller('shop')
 export class ShopController {
@@ -16,6 +19,7 @@ export class ShopController {
 
     @ApiTags('Shop')
     @ApiBearerAuth()
+    @Roles(Role.Admin)
     @Get('/')
     @ApiOperation({
         summary: 'Get shop list'
@@ -25,7 +29,11 @@ export class ShopController {
     })
     async get(@Query() query: string) {
         const filters = new ShopSearchFilter(query);
-        return this.shopService.get(filters);
+        const result = await this.shopService.get(filters);
+        if (result instanceof Error) {
+            checkError(result);
+        }
+        return result;
     }
 
     @ApiTags('Shop')
@@ -54,10 +62,10 @@ export class ShopController {
         return this.shopService.getById(shopId);
     }
 
-    @Public()
     @ApiTags('Shop')
     @ApiBearerAuth()
     @Post('/')
+    @Roles(Role.Admin, Role.Owner)
     @ApiOperation({
         summary: 'Create new shop',
     })
@@ -70,8 +78,8 @@ export class ShopController {
     @ApiResponse({
         status: 500,
     })
-    async create(@Body() dto: CreateShopDto) {
-        const data = await this.shopService.save(dto);
+    async create(@Body() dto: CreateShopDto, @User() user: UserDto) {
+        const data = await this.shopService.save(dto, user);
         if (data instanceof Error) {
             checkError(data);
         }
@@ -87,8 +95,8 @@ export class ShopController {
     @ApiResponse({
         status: 200,
     })
-    async update(@Body() dto: CreateShopDto, @Param('id') shopId: Uuid) {
-        const data = await this.shopService.save(dto);
+    async update(@Body() dto: CreateShopDto, @User() user: UserDto) {
+        const data = await this.shopService.save(dto, user);
         if (data instanceof Error) {
             checkError(data);
         }

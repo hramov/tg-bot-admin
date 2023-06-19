@@ -12,6 +12,7 @@ import {TelegramError} from "../../../../Core/Context/Shop/Error/Telegram.error"
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import { ShopEntity } from "../../common/persistent/entity/shop/shop.entity";
+import {UserDto} from "../user/dto/user.dto";
 
 @Injectable()
 export class ShopService {
@@ -30,7 +31,7 @@ export class ShopService {
         return this.shopRepository.findOneBy({owner_tg_name: ownerTgName});
     }
 
-    async save(dto: CreateShopDto): Promise<Uuid | Error> {
+    async save(dto: CreateShopDto, user: UserDto): Promise<Uuid | Error> {
         if (dto.owner_tg_name.match(telegramUsernameRegexp) === null) {
             return new Error('Wrong telegram username format');
         }
@@ -50,6 +51,7 @@ export class ShopService {
         }
 
         const shop = this.shopRepository.create();
+        shop.owner_id = user.id;
         shop.owner_tg_name = dto.owner_tg_name;
         shop.local_shop_name = dto.local_shop_name;
         shop.bot_token = dto.bot_token;

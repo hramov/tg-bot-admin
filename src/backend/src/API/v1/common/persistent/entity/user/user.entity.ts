@@ -14,9 +14,15 @@ export class UserEntity extends BaseEntity {
     })
     public tg_name: string;
 
-    @ManyToOne(() => RoleEntity, role => role.code)
-    @JoinColumn({
-        name: 'role_id'
+    @Column({
+        name: 'password',
+    })
+    public password: string;
+
+    @ManyToOne(() => RoleEntity, role => role.id)
+    @Column({
+        name: 'role_id',
+        type: 'uuid',
     })
     public role_id: string; // admin, shop owner, shop manager
 

@@ -12,8 +12,9 @@ export class ShopEntity extends BaseEntity {
     local_shop_name: string;
 
     @OneToOne(() => UserEntity, user => user.id)
-    @JoinColumn({
-        name: 'owner_id'
+    @Column({
+        name: 'owner_id',
+        type: 'uuid',
     })
     owner_id: string;
 
