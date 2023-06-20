@@ -18,7 +18,7 @@ config({
 async function bootstrap() {
   const logger = new Logger('Main');
   const app = await NestFactory.create(AppModule, {
-    logger: logger,
+    logger: false,
   });
 
   app.setGlobalPrefix(process.env.APP_GLOBAL_PREFIX);

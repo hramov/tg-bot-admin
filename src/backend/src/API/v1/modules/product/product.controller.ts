@@ -7,6 +7,7 @@ import {ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags} from "@nestj
 import {Uuid} from "../../../../Shared/src/ValueObject/Objects/Uuid";
 import {ProductDto} from "./dto/product.dto";
 import {ProductSearchFilter} from "../../common/filters/product/search.filter";
+import {checkError} from "../../error/CheckError";
 
 @Controller('product')
 export class ProductController {
@@ -55,7 +56,11 @@ export class ProductController {
         status: 200,
     })
     async create(@Body() dto: ProductDto) {
-        return this.productService.create(dto);
+        const result = await this.productService.save(dto);
+        if (result instanceof Error) {
+            checkError(result);
+        }
+        return result;
     }
 
     @ApiTags('Product')
@@ -67,8 +72,12 @@ export class ProductController {
     @ApiResponse({
         status: 200,
     })
-    async update(@Body() dto: ProductDto, @Param('id') productId: Uuid) {
-        return this.productService.update(productId);
+    async update(@Body() dto: ProductDto) {
+        const result = await this.productService.save(dto);
+        if (result instanceof Error) {
+            checkError(result);
+        }
+        return result;
     }
 
     @ApiTags('Product')
