@@ -6,7 +6,7 @@ import {ShopService} from "./shop.service";
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {Uuid} from "../../../../Shared/src/ValueObject/Objects/Uuid";
 import {ShopSearchFilter} from "../../common/filters/shop/search.filter";
-import {CreateShopDto} from "./dto/create-shop.dto";
+import {ShopDto} from "./dto/shop.dto";
 import {checkError} from "../../error/CheckError";
 import {Roles} from "../auth/roles.decorator";
 import {Role} from "../auth/role.enum";
@@ -83,7 +83,7 @@ export class ShopController {
     @ApiResponse({
         status: 500,
     })
-    async create(@Body() dto: CreateShopDto, @User() user: UserDto) {
+    async create(@Body() dto: ShopDto, @User() user: UserDto) {
         const data = await this.shopService.save(dto, user);
         if (data instanceof Error) {
             checkError(data);
@@ -100,7 +100,7 @@ export class ShopController {
     @ApiResponse({
         status: 200,
     })
-    async update(@Body() dto: CreateShopDto, @User() user: UserDto) {
+    async update(@Body() dto: ShopDto, @User() user: UserDto) {
         const data = await this.shopService.save(dto, user);
         if (data instanceof Error) {
             checkError(data);

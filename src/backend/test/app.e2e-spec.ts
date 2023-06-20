@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/API/v1/app.module';
-import {CreateShopDto} from "../src/API/v1/modules/shop/dto/create-shop.dto";
+import {CreateShopDto} from "../src/API/v1/modules/shop/dto/shop.dto";
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;

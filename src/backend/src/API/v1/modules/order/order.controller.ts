@@ -7,6 +7,7 @@ import {OrderService} from "./order.service";
 import {Uuid} from "../../../../Shared/src/ValueObject/Objects/Uuid";
 import {OrderDto} from "./dto/order.dto";
 import {OrderSearchFilter} from "../../common/filters/order/search.filter";
+import {checkError} from "../../error/CheckError";
 
 @Controller('order')
 export class OrderController {
@@ -23,7 +24,11 @@ export class OrderController {
     })
     async get(@Query() query: string) {
         const filters = new OrderSearchFilter(query);
-        return this.orderService.get(filters);
+        const result = await this.orderService.get(filters);
+        if (result instanceof Error) {
+            checkError(result);
+        }
+        return result;
     }
 
     @ApiTags('Order')

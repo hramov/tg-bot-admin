@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {Uuid} from "../../../../Shared/src/ValueObject/Objects/Uuid";
 import {ShopSearchFilter} from "../../common/filters/shop/search.filter";
-import {CreateShopDto} from "./dto/create-shop.dto";
+import {ShopDto} from "./dto/shop.dto";
 import {Fetch} from "../../../../Infrastructure/Fetch/Fetch";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -35,7 +35,7 @@ export class ShopService {
         return this.shopRepository.findOne({ where: {owner_id: ownerId}, relations: { products: true } });
     }
 
-    async save(dto: CreateShopDto, user: UserDto): Promise<Uuid | Error> {
+    async save(dto: ShopDto, user: UserDto): Promise<Uuid | Error> {
         if (dto.owner_tg_name.match(telegramUsernameRegexp) === null) {
             return new Error('Wrong telegram username format');
         }

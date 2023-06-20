@@ -23,11 +23,9 @@ export class UserController {
     })
     async info(@User() user: UserDto) {
         const result = await this.userService.getById(new Uuid(user.id));
-
         if (result instanceof Error) {
             checkError(result);
         }
-
         return result;
     }
 

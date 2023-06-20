@@ -2,7 +2,7 @@ import {ShopService} from "../../../src/API/v1/modules/shop/shop.service";
 import {Uuid} from "../../../src/Shared/src/ValueObject/Objects/Uuid";
 import {DatabaseError} from "../../../src/Core/Error/Database.error";
 import {ShopConstructor} from "../../../src/Core/Context/Shop/Shop";
-import {CreateShopDto} from "../../../src/API/v1/modules/shop/dto/create-shop.dto";
+import {CreateShopDto} from "../../../src/API/v1/modules/shop/dto/shop.dto";
 import {ShopEntity} from "../../../src/API/v1/common/persistent/entity/shop.entity";
 
 describe('Shop service', () => {
