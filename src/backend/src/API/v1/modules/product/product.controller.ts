@@ -1,6 +1,6 @@
 import {
     Body,
-    Controller, Delete, Get, Param, Post, Put, Query,
+    Controller, Delete, Get, HttpCode, Param, Post, Put, Query,
 } from '@nestjs/common';
 import {ProductService} from "./product.service";
 import {ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
@@ -16,6 +16,7 @@ export class ProductController {
     @ApiTags('Product')
     @ApiBearerAuth()
     @Get('/')
+    @HttpCode(200)
     @ApiOperation({
         summary: 'Get all products by filters'
     })
@@ -32,6 +33,7 @@ export class ProductController {
     @ApiTags('Product')
     @ApiBearerAuth()
     @Get('/:id')
+    @HttpCode(200)
     @ApiOperation({
         summary: 'Get product by id'
     })
@@ -46,6 +48,7 @@ export class ProductController {
     @ApiTags('Product')
     @ApiBearerAuth()
     @Post('/')
+    @HttpCode(201)
     @ApiOperation({
         summary: 'Create new product',
     })
@@ -66,6 +69,7 @@ export class ProductController {
     @ApiTags('Product')
     @ApiBearerAuth()
     @Put('/:id')
+    @HttpCode(204)
     @ApiOperation({
         summary: 'Update product'
     })
@@ -83,6 +87,7 @@ export class ProductController {
     @ApiTags('Product')
     @ApiBearerAuth()
     @Delete('/:id')
+    @HttpCode(204)
     @ApiOperation({
         summary: 'Delete product'
     })

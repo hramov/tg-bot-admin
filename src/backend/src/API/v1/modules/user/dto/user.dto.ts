@@ -22,5 +22,5 @@ export class UserDto {
         description: 'User role code',
     })
     @IsNumber()
-    public role_code: string;
+    public role_code: number;
 }

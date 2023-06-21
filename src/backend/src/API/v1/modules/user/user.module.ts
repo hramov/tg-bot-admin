@@ -9,6 +9,7 @@ import {RoleEntity} from "../../common/persistent/entity/role.entity";
 @Module({
     imports: [LoggerModule, TypeOrmModule.forFeature([UserEntity, RoleEntity])],
     providers: [UserService],
-    controllers: [UserController]
+    controllers: [UserController],
+    exports: [UserService]
 })
 export class UserModule {}

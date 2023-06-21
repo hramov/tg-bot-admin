@@ -1,6 +1,6 @@
 import {
     Body,
-    Controller, Delete, Get, Param, Post, Put, Query
+    Controller, Delete, Get, HttpCode, Param, Post, Put, Query
 } from '@nestjs/common';
 import {ShopService} from "./shop.service";
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
@@ -21,6 +21,7 @@ export class ShopController {
     @ApiBearerAuth()
     @Roles(Role.Admin)
     @Get('/')
+    @HttpCode(200)
     @ApiOperation({
         summary: 'Get shop list'
     })
@@ -39,6 +40,7 @@ export class ShopController {
     @ApiTags('Shop')
     @ApiBearerAuth()
     @Get('/my')
+    @HttpCode(200)
     @Roles(Role.Admin, Role.Owner)
     @ApiOperation({
         summary: 'Get user shop'
@@ -57,6 +59,7 @@ export class ShopController {
     @ApiTags('Shop')
     @ApiBearerAuth()
     @Get('/:id')
+    @HttpCode(200)
     @ApiOperation({
         summary: 'Get shop by id'
     })
@@ -70,6 +73,7 @@ export class ShopController {
     @ApiTags('Shop')
     @ApiBearerAuth()
     @Post('/')
+    @HttpCode(201)
     @Roles(Role.Admin, Role.Owner)
     @ApiOperation({
         summary: 'Create new shop',
@@ -94,6 +98,7 @@ export class ShopController {
     @ApiTags('Shop')
     @ApiBearerAuth()
     @Put('/:id')
+    @HttpCode(204)
     @ApiOperation({
         summary: 'Update existing shop'
     })
@@ -111,6 +116,7 @@ export class ShopController {
     @ApiTags('Shop')
     @ApiBearerAuth()
     @Delete('/:id')
+    @HttpCode(204)
     @ApiOperation({
         summary: 'Delete shop'
     })

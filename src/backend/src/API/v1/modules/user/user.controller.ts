@@ -1,5 +1,5 @@
 import {
-    Controller, Get, Post,
+    Controller, Get, HttpCode, Post,
 } from '@nestjs/common';
 import {UserService} from "./user.service";
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
@@ -14,6 +14,7 @@ export class UserController {
 
     @ApiTags('User')
     @Get('/info')
+    @HttpCode(200)
     @ApiBearerAuth()
     @ApiOperation({
         summary: 'Get user info via token'

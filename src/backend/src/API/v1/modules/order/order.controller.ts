@@ -1,6 +1,6 @@
 import {
     Body,
-    Controller, Delete, Get, Param, Post, Query,
+    Controller, Delete, Get, HttpCode, Param, Post, Query,
 } from '@nestjs/common';
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {OrderService} from "./order.service";
@@ -16,6 +16,7 @@ export class OrderController {
     @ApiTags('Order')
     @ApiBearerAuth()
     @Get('/')
+    @HttpCode(200)
     @ApiOperation({
         summary: 'Get all orders by filters'
     })
@@ -34,6 +35,7 @@ export class OrderController {
     @ApiTags('Order')
     @ApiBearerAuth()
     @Get('/:id')
+    @HttpCode(200)
     @ApiOperation({
         summary: 'Get order by id'
     })
@@ -47,6 +49,7 @@ export class OrderController {
     @ApiTags('Order')
     @ApiBearerAuth()
     @Post('/')
+    @HttpCode(201)
     @ApiOperation({
         summary: 'Create new order'
     })
@@ -60,6 +63,7 @@ export class OrderController {
     @ApiTags('Order')
     @ApiBearerAuth()
     @Delete('/:id')
+    @HttpCode(204)
     @ApiOperation({
         summary: 'Cancel order'
     })

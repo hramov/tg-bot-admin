@@ -2,6 +2,7 @@ import {ApiProperty} from "@nestjs/swagger";
 import {IsNumber, IsString, IsStrongPassword} from "class-validator";
 
 export class RegisterDto {
+
     @ApiProperty({
         type: 'string',
         description: 'Telegram username',
