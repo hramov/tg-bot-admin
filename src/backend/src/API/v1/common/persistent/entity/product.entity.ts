@@ -1,11 +1,10 @@
 import {Column, Entity, JoinColumn, ManyToOne} from "typeorm";
-import {BaseEntity} from "../entity";
+import {BaseEntity} from "./entity";
 import {ShopEntity} from "./shop.entity";
 import {CategoryEntity} from "./category.entity";
 
 @Entity({
     name: 'product',
-    schema: 'shop'
 })
 export class ProductEntity extends BaseEntity {
     @Column()
@@ -36,13 +35,13 @@ export class ProductEntity extends BaseEntity {
 
     @ManyToOne(() => ShopEntity, shop => shop.products)
     @JoinColumn({
-        name: 'shop_id'
+        name: 'shop'
     })
-    public shop_id: ShopEntity;
+    public shop: ShopEntity;
 
     @ManyToOne(() => CategoryEntity, category => category.products)
     @JoinColumn({
-        name: 'category_id'
+        name: 'category'
     })
-    public category_id: string;
+    public category: CategoryEntity;
 }

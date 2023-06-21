@@ -1,12 +1,13 @@
 import {
     Body,
-    Controller, Delete, Get, Param, Post, Query,
+    Controller, Delete, Get, HttpCode, Param, Post, Query,
 } from '@nestjs/common';
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {OrderService} from "./order.service";
 import {Uuid} from "../../../../Shared/src/ValueObject/Objects/Uuid";
 import {OrderDto} from "./dto/order.dto";
 import {OrderSearchFilter} from "../../common/filters/order/search.filter";
+import {checkError} from "../../error/CheckError";
 
 @Controller('order')
 export class OrderController {
@@ -15,6 +16,7 @@ export class OrderController {
     @ApiTags('Order')
     @ApiBearerAuth()
     @Get('/')
+    @HttpCode(200)
     @ApiOperation({
         summary: 'Get all orders by filters'
     })
@@ -23,12 +25,17 @@ export class OrderController {
     })
     async get(@Query() query: string) {
         const filters = new OrderSearchFilter(query);
-        return this.orderService.get(filters);
+        const result = await this.orderService.get(filters);
+        if (result instanceof Error) {
+            checkError(result);
+        }
+        return result;
     }
 
     @ApiTags('Order')
     @ApiBearerAuth()
     @Get('/:id')
+    @HttpCode(200)
     @ApiOperation({
         summary: 'Get order by id'
     })
@@ -42,6 +49,7 @@ export class OrderController {
     @ApiTags('Order')
     @ApiBearerAuth()
     @Post('/')
+    @HttpCode(201)
     @ApiOperation({
         summary: 'Create new order'
     })
@@ -55,6 +63,7 @@ export class OrderController {
     @ApiTags('Order')
     @ApiBearerAuth()
     @Delete('/:id')
+    @HttpCode(204)
     @ApiOperation({
         summary: 'Cancel order'
     })

@@ -3,23 +3,26 @@ import {LoggerModule} from "../../common/logger/logger.module";
 import {AuthService} from "./auth.service";
 import {AuthController} from "./auth.controller";
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {UserEntity} from "../../common/persistent/entity/user/user.entity";
-import {RoleEntity} from "../../common/persistent/entity/user/role.entity";
+import {UserEntity} from "../../common/persistent/entity/user.entity";
+import {RoleEntity} from "../../common/persistent/entity/role.entity";
 import {JwtModule} from "@nestjs/jwt";
 import {APP_GUARD} from "@nestjs/core";
 import {AuthGuard} from "./auth.guard";
 import {RolesGuard} from "./roles.guard";
 import {secret} from "./auth.constants";
+import {AccessTokenStrategy} from "./strategy/access_token.strategy";
+import {RefreshTokenStrategy} from "./strategy/refresh_token.strategy";
+import {UserModule} from "../user/user.module";
 
 @Module({
-    imports: [LoggerModule,
+    imports: [LoggerModule, UserModule,
         JwtModule.register({
             global: true,
             secret: secret, // TODO move to config
-            signOptions: { expiresIn: '30m' },
+            signOptions: { expiresIn: '24h' },
         }),
         TypeOrmModule.forFeature([UserEntity, RoleEntity])],
-    providers: [AuthService, {
+    providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy, {
         provide: APP_GUARD,
         useClass: AuthGuard,
     }, {

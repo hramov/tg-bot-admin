@@ -1,6 +1,6 @@
 import {
     Body,
-    Controller, Post,
+    Controller, HttpCode, Post,
 } from '@nestjs/common';
 import {ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {AuthService} from "./auth.service";
@@ -15,6 +15,7 @@ export class AuthController {
 
     @ApiTags('Auth')
     @Post('/login')
+    @HttpCode(200)
     @Public()
     @ApiOperation({
         summary: 'Login'
@@ -32,6 +33,7 @@ export class AuthController {
 
     @ApiTags('Auth')
     @Post('/register')
+    @HttpCode(201)
     @Public()
     @ApiOperation({
         summary: 'Register'
@@ -41,6 +43,23 @@ export class AuthController {
     })
     async register(@Body() dto: RegisterDto) {
         const result = await this.authService.register(dto);
+        if (result instanceof Error) {
+            checkError(result)
+        }
+        return result;
+    }
+
+    @ApiTags('Auth')
+    @Post('/refresh')
+    @HttpCode(200)
+    @ApiOperation({
+        summary: 'Refresh tokens via refresh token'
+    })
+    @ApiResponse({
+        status: 200,
+    })
+    async refresh(@Body() dto: { refresh_token: string }) {
+        const result = await this.authService.refreshTokens(dto.refresh_token);
         if (result instanceof Error) {
             checkError(result)
         }

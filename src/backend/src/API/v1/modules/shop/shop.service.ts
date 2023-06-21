@@ -1,7 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {Uuid} from "../../../../Shared/src/ValueObject/Objects/Uuid";
 import {ShopSearchFilter} from "../../common/filters/shop/search.filter";
-import {CreateShopDto} from "./dto/create-shop.dto";
+import {ShopDto} from "./dto/shop.dto";
 import {Fetch} from "../../../../Infrastructure/Fetch/Fetch";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -11,13 +11,17 @@ import {telegramBotTokenRegexp, telegramUsernameRegexp} from "./shop.constants";
 import {TelegramError} from "../../../../Core/Context/Shop/Error/Telegram.error";
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
-import { ShopEntity } from "../../common/persistent/entity/shop/shop.entity";
+import { ShopEntity } from "../../common/persistent/entity/shop.entity";
 import {UserDto} from "../user/dto/user.dto";
+import {UserEntity} from "../../common/persistent/entity/user.entity";
 
 @Injectable()
 export class ShopService {
 
-    constructor(@InjectRepository(ShopEntity) private readonly shopRepository: Repository<ShopEntity>) {}
+    constructor(
+        @InjectRepository(ShopEntity) private readonly shopRepository: Repository<ShopEntity>,
+        @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
+    ) {}
 
     async get(filters: ShopSearchFilter) {
         return this.shopRepository.find();
@@ -28,10 +32,10 @@ export class ShopService {
     }
 
     async getByOwnerId(ownerId: string) {
-        return this.shopRepository.findOneBy({owner_id: ownerId});
+        return this.shopRepository.findOne({ where: {owner_id: ownerId}, relations: { products: true } });
     }
 
-    async save(dto: CreateShopDto, user: UserDto): Promise<Uuid | Error> {
+    async save(dto: ShopDto, user: UserDto): Promise<Uuid | Error> {
         if (dto.owner_tg_name.match(telegramUsernameRegexp) === null) {
             return new Error('Wrong telegram username format');
         }
@@ -50,8 +54,12 @@ export class ShopService {
             return new TelegramError(data.message);
         }
 
+        const owner = await this.userRepository.findOneBy({ id: user.id })
+
         const shop = this.shopRepository.create();
-        shop.owner_id = user.id;
+
+        shop.owner_id = owner.id;
+        shop.owner = owner;
         shop.owner_tg_name = dto.owner_tg_name;
         shop.local_shop_name = dto.local_shop_name;
         shop.bot_token = dto.bot_token;

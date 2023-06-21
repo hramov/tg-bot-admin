@@ -1,12 +1,13 @@
 import {
     Body,
-    Controller, Delete, Get, Param, Post, Put, Query,
+    Controller, Delete, Get, HttpCode, Param, Post, Put, Query,
 } from '@nestjs/common';
 import {ProductService} from "./product.service";
 import {ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger";
 import {Uuid} from "../../../../Shared/src/ValueObject/Objects/Uuid";
 import {ProductDto} from "./dto/product.dto";
 import {ProductSearchFilter} from "../../common/filters/product/search.filter";
+import {checkError} from "../../error/CheckError";
 
 @Controller('product')
 export class ProductController {
@@ -15,6 +16,7 @@ export class ProductController {
     @ApiTags('Product')
     @ApiBearerAuth()
     @Get('/')
+    @HttpCode(200)
     @ApiOperation({
         summary: 'Get all products by filters'
     })
@@ -31,6 +33,7 @@ export class ProductController {
     @ApiTags('Product')
     @ApiBearerAuth()
     @Get('/:id')
+    @HttpCode(200)
     @ApiOperation({
         summary: 'Get product by id'
     })
@@ -45,6 +48,7 @@ export class ProductController {
     @ApiTags('Product')
     @ApiBearerAuth()
     @Post('/')
+    @HttpCode(201)
     @ApiOperation({
         summary: 'Create new product',
     })
@@ -55,25 +59,35 @@ export class ProductController {
         status: 200,
     })
     async create(@Body() dto: ProductDto) {
-        return this.productService.create(dto);
+        const result = await this.productService.save(dto);
+        if (result instanceof Error) {
+            checkError(result);
+        }
+        return result;
     }
 
     @ApiTags('Product')
     @ApiBearerAuth()
     @Put('/:id')
+    @HttpCode(204)
     @ApiOperation({
         summary: 'Update product'
     })
     @ApiResponse({
         status: 200,
     })
-    async update(@Body() dto: ProductDto, @Param('id') productId: Uuid) {
-        return this.productService.update(productId);
+    async update(@Body() dto: ProductDto) {
+        const result = await this.productService.save(dto);
+        if (result instanceof Error) {
+            checkError(result);
+        }
+        return result;
     }
 
     @ApiTags('Product')
     @ApiBearerAuth()
     @Delete('/:id')
+    @HttpCode(204)
     @ApiOperation({
         summary: 'Delete product'
     })
