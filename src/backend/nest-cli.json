@@ -4,6 +4,8 @@
   "sourceRoot": "src/API/v1",
   "entryFile": "API/v1/main.js",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "builder": "swc",
+    "typeCheck": true
   }
 }
