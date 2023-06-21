@@ -10,8 +10,6 @@ import {APP_GUARD} from "@nestjs/core";
 import {AuthGuard} from "./auth.guard";
 import {RolesGuard} from "./roles.guard";
 import {secret} from "./auth.constants";
-import {AccessTokenStrategy} from "./strategy/access_token.strategy";
-import {RefreshTokenStrategy} from "./strategy/refresh_token.strategy";
 import {UserModule} from "../user/user.module";
 
 @Module({
@@ -22,7 +20,7 @@ import {UserModule} from "../user/user.module";
             signOptions: { expiresIn: '24h' },
         }),
         TypeOrmModule.forFeature([UserEntity, RoleEntity])],
-    providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy, {
+    providers: [AuthService, {
         provide: APP_GUARD,
         useClass: AuthGuard,
     }, {
