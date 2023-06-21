@@ -2,30 +2,36 @@ import { NestFactory } from '@nestjs/core';
 import { config } from 'dotenv';
 import { NextFunction } from 'express';
 import {AppModule} from "./app.module";
-import {Logger} from "../../Infrastructure/Logger/Logger";
-import {ASYNC_STORAGE} from "./common/constants";
+import { ASYNC_STORAGE, LOGGER } from "./common/constants";
 import {CustomLoggerService} from "./common/logger/custom-logger.service";
-import {Uuid} from "../../Shared/src/ValueObject/Objects/Uuid";
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
 import {ValidationPipe} from "@nestjs/common";
 import {Fetch} from "../../Infrastructure/Fetch/Fetch";
 import helmet from 'helmet';
+import { v4 } from 'uuid';
+import { Logger } from "../../Infrastructure/Logger/Logger";
+import { NestExpressApplication } from "@nestjs/platform-express";
 
 config({
   path: '.env.local',
 });
 
 async function bootstrap() {
-  const logger = new Logger('Main');
-  const app = await NestFactory.create(AppModule, {
-    logger: false,
+  const logger = new Logger('App')
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: logger,
   });
 
   app.setGlobalPrefix(process.env.APP_GLOBAL_PREFIX);
-  app.enableCors();
+  app.enableCors({
+    origin: '*',
+    allowedHeaders: '*',
+    methods: '*',
+    exposedHeaders: '*'
+  });
   app.use((req: any, res: any, next: NextFunction) => {
     const asyncStorage = app.get(ASYNC_STORAGE);
-    const traceId = req.headers['x-request-id'] || new Uuid().toString();
+    const traceId = req.headers['x-request-id'] || v4().toString();
     const store = new Map<string, string>().set('traceId', traceId);
     asyncStorage.run(store, () => {
       next();
@@ -34,15 +40,15 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
 
-  app.useLogger(app.get<CustomLoggerService>('CustomLogger'));
+  app.useLogger(app.get<CustomLoggerService>(LOGGER));
 
   app.use(helmet());
 
   Fetch.init()
 
   const config = new DocumentBuilder()
-      .setTitle('TBotAdmin')
-      .setDescription('TBotAdmin API')
+      .setTitle('GVC Projects')
+      .setDescription('GVC Projects MVC')
       .setVersion('1.0.0')
       .build();
   const document = SwaggerModule.createDocument(app, config);
